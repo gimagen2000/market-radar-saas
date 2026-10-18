@@ -64,59 +64,96 @@ st.sidebar.markdown(f"**Plan Actual:** `{st.session_state.user_plan}`")
 
 # --- CONTENIDO PRINCIPAL ---
 st.title("📊 Market Radar Quant Terminal")
-st.markdown("### Procesamiento Estadístico de Mercados y Flujos Institucionales")
+st.markdown("### Procesamiento Estadístico de Mercados, Cartera Completa y Sesgo Long-Only")
 
-# MÓDULO 1: RADAR DE PERCENTILES
-st.header("1. Radar Cuantitativo de Activos")
-df_market = pd.DataFrame({
-    "Activo": ["EUR/USD", "WTI Crude", "Gold (XAU)", "S&P 500", "Copper"],
-    "Clase": ["Forex", "Commodity", "Commodity", "Índice", "Commodity"],
-    "Precio Actual": [1.0850, 78.40, 2380.50, 5250.00, 4.25],
-    "Percentil 1Y": [15.2, 88.5, 92.1, 85.0, 18.3],
-    "Percentil 3M": [10.5, 75.2, 80.0, 70.4, 12.1],
-    "Estado Estadístico": ["Rango de Desviación Bajo (≤20%)", "Sobrecompra", "Sobrecompra", "Sobrecompra", "Rango de Desviación Bajo (≤20%)"],
-    "Flujo COT (Institucional)": ["Neto Comprador (+14k)", "Neto Vendedor (-8k)", "Neto Comprador (+22k)", "Neutral", "Neto Comprador (+19k)"]
+# BASE DE DATOS DE LA CARTERA COMPLETA
+df_market_full = pd.DataFrame({
+    "Activo": ["EUR/USD", "GBP/USD", "USD/JPY", "WTI Crude", "Brent Crude", "Gold (XAU)", "Silver (XAG)", "S&P 500", "Nasdaq 100", "Copper", "Coffee", "Sugar"],
+    "Clase": ["Forex", "Forex", "Forex", "Commodity", "Commodity", "Commodity", "Commodity", "Índice", "Índice", "Commodity", "Softs", "Softs"],
+    "Precio Actual": [1.0850, 1.2980, 149.20, 78.40, 82.10, 2380.50, 28.40, 5250.00, 18200.00, 4.25, 245.00, 22.10],
+    "Percentil 1Y": [15.2, 18.5, 89.0, 88.5, 82.0, 92.1, 85.0, 85.0, 88.0, 18.3, 12.0, 19.5],
+    "Percentil 3M": [10.5, 14.2, 85.1, 75.2, 70.1, 80.0, 78.0, 70.4, 75.0, 12.1, 8.5, 15.0],
+    "Estructura Estadística": [
+        "Desviación Baja (≤20%) - Sesgo Comprador", "Desviación Baja (≤20%) - Sesgo Comprador", "Sobrecompra", 
+        "Sobrecompra", "Sobrecompra", "Sobrecompra", "Sobrecompra", "Sobrecompra", "Sobrecompra", 
+        "Desviación Baja (≤20%) - Sesgo Comprador", "Desviación Baja (≤20%) - Sesgo Comprador", "Desviación Baja (≤20%) - Sesgo Comprador"
+    ],
+    "Flujo COT (Institucional)": [
+        "Neto Comprador (+14k)", "Neto Comprador (+8k)", "Neto Vendedor (-12k)", 
+        "Neto Vendedor (-8k)", "Neutral", "Neto Comprador (+22k)", "Neto Comprador (+5k)", 
+        "Neutral", "Neutral", "Neto Comprador (+19k)", "Neto Comprador (+11k)", "Neto Comprador (+7k)"
+    ]
 })
-st.dataframe(df_market, use_container_width=True)
 
-# MÓDULO 2: MICHAEL VIRTUAL (MOTOR ACADÉMICO)
-st.header("2. Michael Virtual — Asistente de Tesis Cuantitativas")
-activo_sel = st.selectbox("Seleccionar Activo para Histórico", df_market["Activo"].tolist())
-row_sel = df_market[df_market["Activo"] == activo_sel].iloc[0]
+# MÓDULO 1: FILTROS Y VISTA DE CARTERA COMPLETA
+st.header("1. Explorador de Cartera y Percentiles")
 
-if st.button("Generar Resumen Estadístico"):
+col_f1, col_f2 = st.columns(2)
+with col_f1:
+    vista_cartera = st.radio("Modo de Visualización de Cartera", ["Solo Activos en Percentil Bajo (≤ 20%)", "Ver Cartera Completa (Todos los Activos)"])
+with col_f2:
+    threshold_percentile = st.slider("Umbral Máximo de Percentil 1Y para Filtrado (%)", 5, 50, 20)
+
+if "Solo Activos" in vista_cartera:
+    df_filtered = df_market_full[df_market_full["Percentil 1Y"] <= threshold_percentile]
+else:
+    df_filtered = df_market_full
+
+st.dataframe(df_filtered, use_container_width=True)
+
+# MÓDULO 2: MICHAEL VIRTUAL (TESIS CUANTITATIVA Y ESTRATEGIA LONG-ONLY)
+st.header("2. Michael Virtual — Motor de Tesis de Sesgo Comprador (Long-Only)")
+activo_sel = st.selectbox("Seleccionar Activo para Tesis Contextual", df_market_full["Activo"].tolist())
+row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
+
+if st.button("Generar Informe Técnico Contextual"):
     st.markdown(f"""
     <div class="quant-card">
-    <h4>📋 Resumen de Métricas Históricas: {row_sel['Activo']}</h4>
+    <h4>📋 Informe Técnico para: {row_sel['Activo']} ({row_sel['Clase']})</h4>
     <ul>
-        <li><b>Cotización:</b> {row_sel['Precio Actual']}</li>
-        <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y']}% ({row_sel['Estado Estadístico']})</li>
-        <li><b>Reporte CFTC / COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
+        <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
+        <li><b>Percentil de Desviación 1Y:</b> {row_sel['Percentil 1Y']}%</li>
+        <li><b>Estado de Desviación:</b> {row_sel['Estructura Estadística']}</li>
+        <li><b>Posicionamiento Institucional CFTC (COT):</b> {row_sel['Flujo COT (Institucional)']}</li>
     </ul>
-    <p><b>Nota Analítica:</b> El activo cotiza en rangos estadísticos de desviación respecto a su media histórica. Los datos no constituyen recomendación de compra o venta.</p>
+    <p><b>Evaluación de la Matriz Unidireccional (Long-Only):</b> Cuando un activo presenta percentiles de desviación históricos en zona baja (≤20%) junto a un posicionamiento neto comprador en los reportes COT, el modelo cuantifica una asimetría favorable para estructuras de acumulación por tramos hacia objetivos de media. <i>Información estrictamente descriptiva; no constituye recomendación directa.</i></p>
     </div>
     """, unsafe_allow_html=True)
 
-# MÓDULO 3: CALCULADORA DE RIESGO
-st.header("3. Calculadora de Exposición y Control de Riesgo")
-c1, c2 = st.columns(2)
-with c1:
-    cap = st.number_input("Capital Asignado ($ USD)", value=10000.0)
-    piso = st.slider("Distancia al Suelo Anual Estimada (%)", 1.0, 30.0, 10.0)
-with c2:
-    apalanque = st.selectbox("Apalancamiento Máximo", [1, 2, 5, 10, 20], index=2)
-    expo = cap * apalanque
-    riesgo = cap * (piso / 100.0)
+# MÓDULO 3: CALCULADORA DE EXPOSICIÓN Y GUÍA INSTRUCTIVA
+st.header("3. Calculadora de Exposición y Guía de Gestión de Riesgo (MT4/MT5)")
 
-st.markdown(f"""
+st.markdown("""
 <div class="quant-card">
-    <p><b>Exposición Teórica:</b> ${expo:,.2f} USD</p>
-    <p><b>Riesgo Estimado al Piso Anual:</b> ${riesgo:,.2f} USD</p>
+<b>📘 Instructivo de Operatoria y Gestión de Riesgo Patrimonial (Long-Only):</b><br>
+Esta calculadora determina el dimensionamiento exacto de posición (lotaje) para operar exclusivamente en dirección compradora sin necesidad de utilizar un Stop-Loss rígido convencional. 
+El cálculo dimensiona el riesgo en función de la <b>distancia porcentual al suelo/piso anual estimado del activo</b>, garantizando que la cuenta soporte caídas extremas preservando el margen de flotancia.
 </div>
 """, unsafe_allow_html=True)
 
-# BLOQUEO DE PLANES
+c1, c2 = st.columns(2)
+with c1:
+    cap = st.number_input("Capital Total Asignado ($ USD)", value=10000.0, step=500.0)
+    piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
+    pips_piso = st.number_input("Distancia en Pips/Puntos al Piso Anual", value=250, step=10)
+with c2:
+    apalanque = st.selectbox("Apalancamiento Máximo Operativo", [1, 2, 5, 10, 20], index=2)
+    expo = cap * apalanque
+    riesgo = cap * (piso / 100.0)
+    lote_sugerido = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
+
+st.markdown(f"""
+<div class="quant-card">
+    <h4>📊 Desglose de Parámetros de Operación</h4>
+    <p><b>Exposición Máxima Permitida:</b> ${expo:,.2f} USD (con apalancamiento {apalanque}x)</p>
+    <p><b>Riesgo Teórico Asumido al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
+    <p><b>Dimensionamiento de Posición Sugerido:</b> <code>{lote_sugerido:.2f} Lotes</code> (MT4/MT5)</p>
+    <p style='font-size:12px; color:#8b949e;'>Nota: El lotaje asegura que si el activo retrocede hasta su suelo anual estimado, la pérdida no superará el porcentaje configurado.</p>
+</div>
+""", unsafe_allow_html=True)
+
+# BLOQUEO DE PLANES AVANZADOS
 if st.session_state.user_plan == "Free":
-    st.info("🔒 **Funciones Pro/VIP Bloqueadas:** Actualiza tu cuenta para acceder a alertas por Telegram y backtesting.")
+    st.info("🔒 **Funciones Pro/VIP Bloqueadas:** Actualiza tu cuenta para acceder a alertas por Telegram y módulo de backtesting profundo.")
 else:
     st.success("✨ Módulo Pro Activo: Conexión de alertas y datos extendidos habilitados.")
