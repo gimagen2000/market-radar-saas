@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 
+# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
     page_title="Market Radar Quant Terminal",
     page_icon="📈",
@@ -9,6 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -16,9 +18,30 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
+    /* ESTILOS DE PUBLICIDAD MONETIZABLE */
+    .ad-container {
+        background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
+        border: 1px dashed #e3b341;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .ad-title { color: #e3b341; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+    .ad-button {
+        background-color: #238636;
+        color: white !important;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 8px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
+# --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
 if 'user_plan' not in st.session_state:
@@ -42,6 +65,7 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
+# --- BARRA LATERAL CON PUBLICIDAD ---
 st.sidebar.title("🔐 Licencia SaaS")
 user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
 selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
@@ -54,6 +78,16 @@ if st.sidebar.button("Validar Licencia"):
     else:
         st.session_state.user_plan = "Free"
     st.sidebar.success(f"Nivel Activo: {st.session_state.user_plan}")
+
+# BANNER PATROCINADO EN SIDEBAR
+if st.session_state.user_plan == "Free":
+    st.sidebar.markdown("""
+    <div class="ad-container">
+        <div class="ad-title">Anuncio Patrocinado</div>
+        <p style="font-size: 12px; color: #c9d1d9;">¿Buscas un Broker con bajos spreads para operar Long-Only?</p>
+        <a href="https://ftmo.com" target="_blank" class="ad-button">Abrir Cuenta de Pruebas</a>
+    </div>
+    """, unsafe_allow_html=True)
 
 ACTIVOS_TICKERS = {
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)"},
@@ -112,7 +146,7 @@ def obtener_datos_mercado_real():
 st.title("📊 Market Radar Quant Terminal")
 st.markdown("### Procesamiento Estadístico de Mercados, Cartera Completa y Noticias en Vivo")
 
-with st.spinner("Actualizando datos cuantitativos en vivo..."):
+with st.spinner("Actualizando cotizaciones en vivo..."):
     df_market_full = obtener_datos_mercado_real()
 
 def estilizar_condicion_pub(row):
@@ -126,6 +160,7 @@ def estilizar_condicion_pub(row):
         color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
     return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
+# MÓDULO 1: EXPLORADOR DE CARTERA
 st.header("1. Explorador de Cartera y Percentiles Anuales")
 col_f1, col_f2 = st.columns(2)
 with col_f1:
@@ -143,28 +178,41 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: MICHAEL VIRTUAL & NOTICIAS
-st.header("2. Michael Virtual — Tesis Cuantitativa y Noticias Recientes")
+# MÓDULO 2: MICHAEL VIRTUAL CON GATILLO PUBLICITARIO Y NOTICIAS REPARADAS
+st.header("2. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
+
 if not df_market_full.empty:
-    activo_sel = st.selectbox("Seleccionar Activo", df_market_full["Activo"].tolist())
+    activo_sel = st.selectbox("Seleccionar Activo para Tesis y Noticias", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
     ticker_sym = ACTIVOS_TICKERS[activo_sel]["ticker"]
 
     col_t1, col_t2 = st.columns([1.2, 1])
 
     with col_t1:
-        st.markdown(f"""
-        <div class="quant-card">
-        <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
-        <ul>
-            <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
-            <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
-            <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
-            <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
-        </ul>
-        <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
-        </div>
-        """, unsafe_allow_html=True)
+        if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
+            
+            # GATILLO MONETIZABLE EN LA TESIS
+            if st.session_state.user_plan == "Free":
+                st.markdown("""
+                <div class="ad-container">
+                    <div class="ad-title">⚡ Patrocinado por Plataformas Afiliadas</div>
+                    <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Quieres ejecutar esta tesis sin pagar comisiones?</b></p>
+                    <a href="https://www.tradingview.com" target="_blank" class="ad-button">Ver Gráfico Profesional Gratis 🚀</a>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown(f"""
+            <div class="quant-card">
+            <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
+            <ul>
+                <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
+                <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
+                <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
+                <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
+            </ul>
+            <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
+            </div>
+            """, unsafe_allow_html=True)
 
     with col_t2:
         st.markdown("#### 📰 Noticias del Mercado")
@@ -172,17 +220,27 @@ if not df_market_full.empty:
             t_obj = yf.Ticker(ticker_sym)
             noticias = t_obj.news
             if noticias:
-                for n in noticias[:3]:
-                    titulo = n.get('title', 'Sin título')
-                    publisher = n.get('publisher', 'Fuente financiera')
-                    link = n.get('link', '#')
-                    st.markdown(f"""
-                    <div class="news-box">
-                    <b>{publisher}:</b> <a href="{link}" target="_blank" style="color: #58a6ff; text-decoration: none;">{titulo}</a>
-                    </div>
-                    """, unsafe_allow_html=True)
+                count = 0
+                for n in noticias:
+                    # Lógica de extracción segura de URL de yfinance
+                    url_val = "#"
+                    if 'link' in n and n['link']:
+                        url_val = n['link']
+                    elif 'content' in n and isinstance(n['content'], dict):
+                        url_val = n['content'].get('clickThroughUrl', {}).get('url', '#')
+                    
+                    titulo = n.get('title', n.get('content', {}).get('title', 'Sin título'))
+                    publisher = n.get('publisher', n.get('content', {}).get('provider', {}).get('displayName', 'Fuente Financiera'))
+
+                    if titulo != 'Sin título' and count < 4:
+                        st.markdown(f"""
+                        <div class="news-box">
+                        <b>{publisher}:</b> <a href="{url_val}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{titulo} 🔗</a>
+                        </div>
+                        """, unsafe_allow_html=True)
+                        count += 1
             else:
-                st.info("No hay noticias recientes indexadas.")
+                st.info("No hay noticias recientes indexadas para este ticker.")
         except Exception:
             st.info("Módulo de noticias temporalmente no disponible.")
 
