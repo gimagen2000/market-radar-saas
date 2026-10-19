@@ -15,6 +15,7 @@ st.markdown("""
     .stMetric { background-color: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; }
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
+    .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -60,13 +61,16 @@ ACTIVOS_TICKERS = {
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)"},
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)"},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral"},
+    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)"},
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)"},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)"},
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral"},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral"},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)"},
-    "Coffee": {"ticker": "KC=F", "clase": "Commodity", "cot": "Neto Comprador (+11k)"},
-    "Sugar": {"ticker": "SB=F", "clase": "Commodity", "cot": "Neto Comprador (+7k)"}
+    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)"},
+    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)"},
+    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)"},
+    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral"}
 }
 
 @st.cache_data(ttl=300)
@@ -106,7 +110,7 @@ def obtener_datos_mercado_real():
     return pd.DataFrame(filas)
 
 st.title("📊 Market Radar Quant Terminal")
-st.markdown("### Procesamiento Estadístico de Mercados en Tiempo Real con Indicadores Cromáticos")
+st.markdown("### Procesamiento Estadístico de Mercados, Cartera Completa y Noticias en Vivo")
 
 with st.spinner("Actualizando datos cuantitativos en vivo..."):
     df_market_full = obtener_datos_mercado_real()
@@ -139,25 +143,48 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: MICHAEL VIRTUAL
-st.header("2. Michael Virtual — Tesis Cuantitativa")
+# MÓDULO 2: MICHAEL VIRTUAL & NOTICIAS
+st.header("2. Michael Virtual — Tesis Cuantitativa y Noticias Recientes")
 if not df_market_full.empty:
     activo_sel = st.selectbox("Seleccionar Activo", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
+    ticker_sym = ACTIVOS_TICKERS[activo_sel]["ticker"]
 
-    if st.button("Generar Informe Estadístico"):
+    col_t1, col_t2 = st.columns([1.2, 1])
+
+    with col_t1:
         st.markdown(f"""
         <div class="quant-card">
         <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
         <ul>
             <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
-            <li><b>Rango 52 Semanas:</b> Mínimo: {row_sel['Mín 52 Sem']} | Máximo: {row_sel['Máx 52 Sem']}</li>
+            <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
             <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
             <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
         </ul>
         <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
         </div>
         """, unsafe_allow_html=True)
+
+    with col_t2:
+        st.markdown("#### 📰 Noticias del Mercado")
+        try:
+            t_obj = yf.Ticker(ticker_sym)
+            noticias = t_obj.news
+            if noticias:
+                for n in noticias[:3]:
+                    titulo = n.get('title', 'Sin título')
+                    publisher = n.get('publisher', 'Fuente financiera')
+                    link = n.get('link', '#')
+                    st.markdown(f"""
+                    <div class="news-box">
+                    <b>{publisher}:</b> <a href="{link}" target="_blank" style="color: #58a6ff; text-decoration: none;">{titulo}</a>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("No hay noticias recientes indexadas.")
+        except Exception:
+            st.info("Módulo de noticias temporalmente no disponible.")
 
 # MÓDULO 3: CALCULADORA DE RIESGO
 st.header("3. Calculadora de Exposición y Control de Riesgo")
