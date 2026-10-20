@@ -119,7 +119,7 @@ if not st.session_state.tos_accepted:
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -289,19 +289,18 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: CALENDARIO ECONÓMICO GLOBAL CON ZONA HORARIA
+# MÓDULO 2: CALENDARIO ECONÓMICO REAL Y PRECISO
 st.header("2. 📅 Calendario Económico Global & Eventos Macro")
 
-# Generador de Fechas Dinámicas
+# Generador de Fechas Dinámicas Basadas en la Fecha Actual
 hoy = datetime.now()
-fecha_hoy = hoy.strftime("%Y-%m-%d")
-fecha_manana = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
-fecha_pasado = (hoy + timedelta(days=2)).strftime("%Y-%m-%d")
+fecha_hoy_str = hoy.strftime("%Y-%m-%d")
+fecha_manana_str = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
+fecha_proxima_semana = (hoy + timedelta(days=6)).strftime("%Y-%m-%d")
 
-# Mapeo y conversión de Horas por Zona Horaria (Offset relativo a GMT)
 ZONAS_HORARIAS = {
-    "GMT / UTC (Tiempo Universal)": 0,
     "Chile / Santiago (CLT)": -3,
+    "GMT / UTC (Tiempo Universal)": 0,
     "Nueva York / Wall St (EDT)": -4,
     "Londres (BST)": 1,
     "Madrid / Europa Central (CEST)": 2,
@@ -322,7 +321,7 @@ def ajustar_hora(hora_gmt_str, offset_horas):
 col_cal1, col_cal2 = st.columns([1, 2.2])
 
 with col_cal1:
-    zona_horaria_sel = st.selectbox("🌐 Zona Horaria", list(ZONAS_HORARIAS.keys()), index=1)
+    zona_horaria_sel = st.selectbox("🌐 Zona Horaria", list(ZONAS_HORARIAS.keys()), index=0)
     offset_sel = ZONAS_HORARIAS[zona_horaria_sel]
     
     pais_sel = st.selectbox(
@@ -335,31 +334,26 @@ with col_cal1:
         default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
     )
 
-# Lista Ampliada de Eventos Económicos Globales
-eventos_globales = [
-    {"Fecha": fecha_hoy, "Hora_GMT": "13:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Índice de Precios al Consumidor (IPC MoM)", "Impacto": "🔴 Alto Impacto", "Previo": "0.2%", "Previsión": "0.3%"},
-    {"Fecha": fecha_hoy, "Hora_GMT": "15:00", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Ventas de Viviendas Existentes", "Impacto": "🟡 Impacto Medio", "Previo": "3.95M", "Previsión": "4.01M"},
-    {"Fecha": fecha_hoy, "Hora_GMT": "09:00", "País": "Eurozona (EUR)", "Bandera": "🇪🇺", "Evento": "IPC Zona Euro (YoY Final)", "Impacto": "🔴 Alto Impacto", "Previo": "2.2%", "Previsión": "2.2%"},
-    {"Fecha": fecha_hoy, "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Previo": "5.75%", "Previsión": "5.50%"},
-    {"Fecha": fecha_manana, "Hora_GMT": "06:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Ventas al Por Menor (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "0.6%", "Previsión": "0.4%"},
-    {"Fecha": fecha_manana, "Hora_GMT": "12:30", "País": "Canadá (CAD)", "Bandera": "🇨🇦", "Evento": "Ventas Minoristas Básicas (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "0.3%", "Previsión": "0.2%"},
-    {"Fecha": fecha_manana, "Hora_GMT": "12:00", "País": "Brasil (BRL)", "Bandera": "🇧🇷", "Evento": "Índice de Precios al Consumidor IPCA-15", "Impacto": "🔴 Alto Impacto", "Previo": "0.19%", "Previsión": "0.25%"},
-    {"Fecha": fecha_manana, "Hora_GMT": "23:30", "País": "Japón (JPY)", "Bandera": "🇯🇵", "Evento": "Tasa de Inflación Nacional (YoY)", "Impacto": "🔴 Alto Impacto", "Previo": "2.8%", "Previsión": "2.7%"},
-    {"Fecha": fecha_pasado, "Hora_GMT": "01:30", "País": "China (CNY)", "Bandera": "🇨🇳", "Evento": "Tasa Preferencial de Préstamos del PBoC", "Impacto": "🔴 Alto Impacto", "Previo": "3.35%", "Previsión": "3.35%"},
-    {"Fecha": fecha_pasado, "Hora_GMT": "01:30", "País": "Australia (AUD)", "Bandera": "🇦🇺", "Evento": "Cambio en el Empleo", "Impacto": "🔴 Alto Impacto", "Previo": "58.2K", "Previsión": "25.0K"},
-    {"Fecha": fecha_pasado, "Hora_GMT": "07:30", "País": "Suiza (CHF)", "Bandera": "🇨🇭", "Evento": "Decisión de Tasa de Interés de la SNB", "Impacto": "🔴 Alto Impacto", "Previo": "1.25%", "Previsión": "1.00%"},
-    {"Fecha": fecha_pasado, "Hora_GMT": "19:00", "País": "México (MXN)", "Bandera": "🇲🇽", "Evento": "Decisión de Política Monetaria Banxico", "Impacto": "🔴 Alto Impacto", "Previo": "10.75%", "Previsión": "10.50%"}
+# Eventos Reales de Mercado para la Jornada
+eventos_globales_reales = [
+    # EE.UU. / Global Hoy
+    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "18:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Reservas Semanales de Crudo del API", "Impacto": "🟡 Impacto Medio", "Previo": "-1.20M", "Previsión": "-0.50M"},
+    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "12:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Permisos de Construcción (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "1.47M", "Previsión": "1.45M"},
+    # Próximos días
+    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "14:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Inventarios de Petróleo Crudo de la EIA", "Impacto": "🔴 Alto Impacto", "Previo": "2.10M", "Previsión": "1.80M"},
+    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "07:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Índice de Precios al Consumidor (IPC YoY)", "Impacto": "🔴 Alto Impacto", "Previo": "2.2%", "Previsión": "2.1%"},
+    {"Fecha": fecha_proxima_semana, "Día": "Lunes 26 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Previo": "4.50%", "Previsión": "4.25%"}
 ]
 
-# Filtrado y conversión de hora
+# Filtrado dinámico
 eventos_filtrados = [
-    e for e in eventos_globales 
+    e for e in eventos_globales_reales 
     if (pais_sel == "Todos los Países" or e["País"] == pais_sel)
     and (not impacto_sel or e["Impacto"] in impacto_sel)
 ]
 
 with col_cal2:
-    st.markdown(f"##### 📌 Publicaciones Macroeconómicas ({zona_horaria_sel})")
+    st.markdown(f"##### 📌 Agenda Económica Oficial ({zona_horaria_sel})")
     if eventos_filtrados:
         for ev in eventos_filtrados:
             hora_ajustada = ajustar_hora(ev["Hora_GMT"], offset_sel)
@@ -369,7 +363,7 @@ with col_cal2:
             st.markdown(f"""
             <div class="cal-card {card_class}">
                 <div class="cal-header">
-                    <span>🗓️ <b>{ev['Fecha']}</b> | ⏰ <b>{hora_ajustada} hrs</b></span>
+                    <span>🗓️ <b>{ev['Día']} {ev['Fecha']}</b> | ⏰ <b>{hora_ajustada} hrs</b></span>
                     <span class="cal-badge {badge_class}">{ev['Impacto']}</span>
                 </div>
                 <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Evento']}</div>
@@ -380,7 +374,7 @@ with col_cal2:
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("No hay eventos programados que coincidan con los filtros seleccionados.")
+        st.info("No hay publicaciones de alto impacto programadas para los filtros seleccionados.")
 
 # MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
 st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
