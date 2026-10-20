@@ -295,7 +295,6 @@ st.header("2. 📅 Calendario Económico Global & Eventos Macro")
 hoy = datetime.now()
 fecha_hoy_str = hoy.strftime("%Y-%m-%d")
 fecha_manana_str = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
-fecha_proxima_semana = (hoy + timedelta(days=6)).strftime("%Y-%m-%d")
 
 ZONAS_HORARIAS = {
     "Chile / Santiago (CLT)": -3,
@@ -333,13 +332,14 @@ with col_cal1:
         default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
     )
 
-# Eventos Reales de Mercado con Resultado Publicado (Actual)
+# Eventos Macroeconómicos Precisos
 eventos_globales_reales = [
     {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "12:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Permisos de Construcción (MoM)", "Impacto": "🟡 Impacto Medio", "Resultado": "1.42M", "Previsión": "1.45M", "Previo": "1.47M"},
     {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "18:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Reservas Semanales de Crudo del API", "Impacto": "🟡 Impacto Medio", "Resultado": "-0.80M", "Previsión": "-0.50M", "Previo": "-1.20M"},
     {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "07:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Índice de Precios al Consumidor (IPC YoY)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "2.1%", "Previo": "2.2%"},
     {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "14:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Inventarios de Petróleo Crudo de la EIA", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "1.80M", "Previo": "2.10M"},
-    {"Fecha": fecha_proxima_semana, "Día": "Lunes 26 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "4.25%", "Previo": "4.50%"}
+    {"Fecha": "2026-10-27", "Día": "Lunes 27 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Reunión de Política Monetaria (RPM BCCh)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "4.25%", "Previo": "4.50%"},
+    {"Fecha": "2026-10-30", "Día": "Viernes 30 Oct", "Hora_GMT": "12:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Tasa de Desempleo INE Chile", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "8.4%", "Previo": "8.7%"}
 ]
 
 eventos_filtrados = [
@@ -423,7 +423,7 @@ if not df_market_full.empty:
         else:
             st.info("No hay noticias recientes indexadas.")
 
-# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP CON DIFERENCIAL Y APALANCAMIENTO
+# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP CON APALANCAMIENTO Y LOTES
 st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
 c1, c2 = st.columns(2)
 with c1:
@@ -435,35 +435,36 @@ with c1:
 
 with c2:
     apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20, 30, 50, 100], index=2)
+    lotes_manuales = st.number_input("Tamaño de Posición Personalizado (Lotes)", value=1.0, min_value=0.01, max_value=100.0, step=0.1)
     
-    # Cálculos Cuantitativos Avanzados
-    expo = cap * apalanque
+    # Cálculos Cuantitativos Integrados
+    expo_teorica = cap * apalanque
+    nocional_lotes = lotes_manuales * 100000  # Valor nocional estándar de Forex/Contrato
     riesgo = cap * (piso / 100.0)
-    lote = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
+    lote_sugerido = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
     
-    # Obtener Swap base por lote
     swap_long = row_sel['Swap Long ($/lote)']
     swap_short = row_sel['Swap Short ($/lote)']
     swap_rate_unit = swap_long if "Long" in direccion_pos else swap_short
     
-    # Diferencial por Lote y Apalancamiento
-    diferencial_swap_lote = swap_rate_unit * lote
+    # Cálculo directo con Lotes e Impacto de Apalancamiento
+    diferencial_swap_lote = swap_rate_unit * lotes_manuales
     costo_swap_total = diferencial_swap_lote * dias_operados
     impacto_swap_pct = (costo_swap_total / cap) * 100
 
 st.markdown(f"""
 <div class="quant-card">
-    <h4>📊 Métricas de Control de Riesgo, Apalancamiento y Swap</h4>
-    <p><b>Capital Base:</b> ${cap:,.2f} USD | <b>Apalancamiento:</b> 1:{apalanque}</p>
-    <p><b>Exposición Teórica Mercado:</b> ${expo:,.2f} USD</p>
-    <p><b>Riesgo Estimado al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
-    <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
+    <h4>📊 Métricas de Control de Riesgo, Lotaje y Apalancamiento</h4>
+    <p><b>Capital Cuenta:</b> ${cap:,.2f} USD | <b>Apalancamiento Seleccionado:</b> 1:{apalanque}</p>
+    <p><b>Exposición Teórica con Apalancamiento:</b> ${expo_teorica:,.2f} USD</p>
+    <p><b>Volumen Real Operado ({lotes_manuales} Lote/s):</b> ${nocional_lotes:,.2f} USD Nocionales</p>
+    <p><b>Dimensionamiento Sugerido por Riesgo al Piso ({piso}%):</b> <code>{lote_sugerido:.2f} Lotes</code></p>
     <hr style="border: 0.5px solid #30363d;">
-    <p><b>Diferencial Swap Neto por Día ({activo_sel}):</b> <code style="color: {'#3fb950' if diferencial_swap_lote >= 0 else '#f85149'};">${diferencial_swap_lote:,.2f} USD/día</code></p>
+    <p><b>Diferencial Swap Neto Diario ({lotes_manuales} lote/s de {activo_sel}):</b> <code style="color: {'#3fb950' if diferencial_swap_lote >= 0 else '#f85149'};">${diferencial_swap_lote:,.2f} USD/día</code></p>
     <p><b>Costo / Crédito Swap Total ({dias_operados} días overnight):</b> 
        <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD ({impacto_swap_pct:+.2f}% sobre capital)</code>
     </p>
-    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se cobra Triple Swap (3 noches) por financiamiento de fin de semana.</i></p>
+    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica Triple Swap (3 noches) por el rollover del fin de semana.</i></p>
 </div>
 """, unsafe_allow_html=True)
 
