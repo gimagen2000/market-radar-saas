@@ -131,35 +131,35 @@ if st.session_state.user_plan == "Free":
 
 # --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
 ACTIVOS_TICKERS = {
-    "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex"},
-    "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina"},
-    "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones"},
-    "AUD/USD": {"ticker": "AUDUSD=X", "clase": "Forex", "cot": "Neto Comprador (+5k)", "query": "AUD USD australian dollar"},
-    "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense"},
-    "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar"},
-    "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo"},
-    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores"},
-    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa"},
-    "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial"},
-    "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt"},
-    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock"},
-    "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo"},
-    "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo"},
-    "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent"},
-    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado"},
-    "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion"},
-    "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion"},
-    "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion"},
-    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado"},
-    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado"},
-    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa"},
-    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado"},
-    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura"},
-    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa"},
-    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado"},
-    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado"},
-    "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio"},
-    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto"}
+    "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
+    "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
+    "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
+    "AUD/USD": {"ticker": "AUDUSD=X", "clase": "Forex", "cot": "Neto Comprador (+5k)", "query": "AUD USD australian dollar", "swap_long": -1.5, "swap_short": -0.4},
+    "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
+    "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
+    "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
+    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
+    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
+    "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
+    "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
+    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
+    "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
+    "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
+    "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
+    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
+    "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion", "swap_long": -3.1, "swap_short": 1.0},
+    "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion", "swap_long": -2.5, "swap_short": 0.8},
+    "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion", "swap_long": -1.0, "swap_short": -0.3},
+    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado", "swap_long": -1.4, "swap_short": -0.2},
+    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado", "swap_long": -0.8, "swap_short": -0.5},
+    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa", "swap_long": -0.9, "swap_short": -0.4},
+    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado", "swap_long": -0.6, "swap_short": -0.3},
+    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
+    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
+    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
+    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
+    "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
+    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
 
 @st.cache_data(ttl=300)
@@ -192,7 +192,9 @@ def obtener_datos_mercado_real():
                     "Percentil 1Y (%)": round(percentil_1y, 1),
                     "Percentil 3M (%)": round(percentil_3m, 1),
                     "Estructura Estadística": estado,
-                    "Flujo COT (Institucional)": info["cot"]
+                    "Flujo COT (Institucional)": info["cot"],
+                    "Swap Long ($/lote)": info["swap_long"],
+                    "Swap Short ($/lote)": info["swap_short"]
                 })
         except Exception:
             pass
@@ -257,8 +259,41 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: MICHAEL VIRTUAL & NOTICIAS
-st.header("2. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
+# MÓDULO 2: CALENDARIO ECONÓMICO Y EVENTOS MACRO
+st.header("2. 📅 Calendario Económico Global & Relevancia por País")
+
+col_cal1, col_cal2 = st.columns([1, 2])
+with col_cal1:
+    pais_sel = st.selectbox("Seleccionar País / Región", ["Todos los Países", "EE.UU. (USD)", "Eurozona (EUR)", "Reino Unido (GBP)", "Japón (JPY)", "China (CNY)"])
+    impacto_sel = st.multiselect("Relevancia / Impacto", ["🔴 Alto Impacto (3 Estrellas)", "🟡 Impacto Medio (2 Estrellas)", "🟢 Bajo Impacto (1 Estrella)"], default=["🔴 Alto Impacto (3 Estrellas)", "🟡 Impacto Medio (2 Estrellas)"])
+
+# Muestra de eventos dinámicos estructurados
+eventos_ejemplo = [
+    {"Hora": "13:30 GMT", "País": "EE.UU. (USD)", "Evento": "Índice de Precios al Consumidor (IPC MoM)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "0.2%", "Previsión": "0.3%"},
+    {"Hora": "15:00 GMT", "País": "EE.UU. (USD)", "Evento": "Ventas de Viviendas Existentes", "Impacto": "🟡 Impacto Medio (2 Estrellas)", "Previo": "3.95M", "Previsión": "4.01M"},
+    {"Hora": "09:00 GMT", "País": "Eurozona (EUR)", "Evento": "IPC Zona Euro (YoY Final)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "2.2%", "Previsión": "2.2%"},
+    {"Hora": "06:00 GMT", "País": "Reino Unido (GBP)", "Evento": "Ventas al Por Menor (MoM)", "Impacto": "🟡 Impacto Medio (2 Estrellas)", "Previo": "0.6%", "Previsión": "0.4%"},
+    {"Hora": "23:30 GMT", "País": "Japón (JPY)", "Evento": "Tasa de Inflación Nacional (YoY)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "2.8%", "Previsión": "2.7%"},
+    {"Hora": "01:30 GMT", "País": "China (CNY)", "Evento": "Tasa Preferencial de Préstamos del PBoC", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "3.35%", "Previsión": "3.35%"}
+]
+
+df_cal = pd.DataFrame(eventos_ejemplo)
+
+if pais_sel != "Todos los Países":
+    df_cal = df_cal[df_cal["País"] == pais_sel]
+
+if impacto_sel:
+    df_cal = df_cal[df_cal["Impacto"].isin(impacto_sel)]
+
+with col_cal2:
+    st.markdown("##### 📌 Publicaciones Macroeconómicas Programadas")
+    if not df_cal.empty:
+        st.dataframe(df_cal, use_container_width=True)
+    else:
+        st.info("No hay eventos que coincidan con los filtros seleccionados.")
+
+# MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
+st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
 if not df_market_full.empty:
     activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
@@ -287,6 +322,8 @@ if not df_market_full.empty:
                 <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
                 <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
                 <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
+                <li><b>Swap Diario Long:</b> <span style="color: {'#3fb950' if row_sel['Swap Long ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Long ($/lote)']} USD/lote</span></li>
+                <li><b>Swap Diario Short:</b> <span style="color: {'#3fb950' if row_sel['Swap Short ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Short ($/lote)']} USD/lote</span></li>
             </ul>
             <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
             </div>
@@ -305,29 +342,41 @@ if not df_market_full.empty:
         else:
             st.info("No hay noticias recientes indexadas.")
 
-# MÓDULO 3: CALCULADORA DE RIESGO
-st.header("3. Calculadora de Exposición y Control de Riesgo")
+# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP OVERNIGHT
+st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
 c1, c2 = st.columns(2)
 with c1:
     cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
     piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
     pips_piso = st.number_input("Pips / Puntos al Piso Anual", value=250, step=10)
+    dias_operados = st.number_input("Días Estimados de Posición (Overnight)", value=5, min_value=1, step=1)
+    direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
+
 with c2:
     apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20], index=2)
     expo = cap * apalanque
     riesgo = cap * (piso / 100.0)
     lote = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
+    
+    # Obtención de Swap según dirección seleccionada
+    swap_rate_unit = row_sel['Swap Long ($/lote)'] if "Long" in direccion_pos else row_sel['Swap Short ($/lote)']
+    costo_swap_total = lote * swap_rate_unit * dias_operados
 
 st.markdown(f"""
 <div class="quant-card">
+    <h4>📊 Métricas de Control de Riesgo y Swap</h4>
     <p><b>Exposición Teórica:</b> ${expo:,.2f} USD</p>
     <p><b>Riesgo al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
     <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
+    <p><b>Costo / Crédito Swap Estimado ({dias_operados} días para {activo_sel}):</b> 
+       <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD</code>
+    </p>
+    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica un Triple Swap (3 noches) por financiamiento del fin de semana.</i></p>
 </div>
 """, unsafe_allow_html=True)
 
-# MÓDULO 4: CANALES Y MEDIOS DE REFERENCIA
-st.header("4. 📺 Canales y Fuentes de Referencia Macroeconómica")
+# MÓDULO 5: CANALES Y MEDIOS DE REFERENCIA
+st.header("5. 📺 Canales y Fuentes de Referencia Macroeconómica")
 st.markdown("""
 <div class="disclaimer-box" style="margin-bottom: 15px;">
 <b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y plataformas asociadas se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
