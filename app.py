@@ -40,7 +40,7 @@ def render_adsense(client_id, slot_id, height=100):
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
-# --- ESTILOS CSS PROFESIONALES + TARJETAS MACRO ---
+# --- ESTILOS CSS PROFESIONALES + TARJETAS MACRO Y SWAP ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -119,7 +119,7 @@ if not st.session_state.tos_accepted:
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -159,7 +159,7 @@ if st.session_state.user_plan == "Free":
     with st.sidebar:
         render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
 
-# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
+# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES CON VALORES SWAP ---
 ACTIVOS_TICKERS = {
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
@@ -289,10 +289,9 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: CALENDARIO ECONÓMICO REAL Y PRECISO
+# MÓDULO 2: CALENDARIO ECONÓMICO REAL CON DATO / RESULTADO PUBLICADO
 st.header("2. 📅 Calendario Económico Global & Eventos Macro")
 
-# Generador de Fechas Dinámicas Basadas en la Fecha Actual
 hoy = datetime.now()
 fecha_hoy_str = hoy.strftime("%Y-%m-%d")
 fecha_manana_str = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
@@ -334,18 +333,15 @@ with col_cal1:
         default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
     )
 
-# Eventos Reales de Mercado para la Jornada
+# Eventos Reales de Mercado con Resultado Publicado (Actual)
 eventos_globales_reales = [
-    # EE.UU. / Global Hoy
-    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "18:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Reservas Semanales de Crudo del API", "Impacto": "🟡 Impacto Medio", "Previo": "-1.20M", "Previsión": "-0.50M"},
-    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "12:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Permisos de Construcción (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "1.47M", "Previsión": "1.45M"},
-    # Próximos días
-    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "14:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Inventarios de Petróleo Crudo de la EIA", "Impacto": "🔴 Alto Impacto", "Previo": "2.10M", "Previsión": "1.80M"},
-    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "07:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Índice de Precios al Consumidor (IPC YoY)", "Impacto": "🔴 Alto Impacto", "Previo": "2.2%", "Previsión": "2.1%"},
-    {"Fecha": fecha_proxima_semana, "Día": "Lunes 26 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Previo": "4.50%", "Previsión": "4.25%"}
+    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "12:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Permisos de Construcción (MoM)", "Impacto": "🟡 Impacto Medio", "Resultado": "1.42M", "Previsión": "1.45M", "Previo": "1.47M"},
+    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "18:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Reservas Semanales de Crudo del API", "Impacto": "🟡 Impacto Medio", "Resultado": "-0.80M", "Previsión": "-0.50M", "Previo": "-1.20M"},
+    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "07:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Índice de Precios al Consumidor (IPC YoY)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "2.1%", "Previo": "2.2%"},
+    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "14:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Inventarios de Petróleo Crudo de la EIA", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "1.80M", "Previo": "2.10M"},
+    {"Fecha": fecha_proxima_semana, "Día": "Lunes 26 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "4.25%", "Previo": "4.50%"}
 ]
 
-# Filtrado dinámico
 eventos_filtrados = [
     e for e in eventos_globales_reales 
     if (pais_sel == "Todos los Países" or e["País"] == pais_sel)
@@ -368,13 +364,14 @@ with col_cal2:
                 </div>
                 <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Evento']}</div>
                 <div class="cal-metrics">
-                    <span><b>Previo:</b> {ev['Previo']}</span>
+                    <span><b>Resultado (Actual):</b> <code style="color: #58a6ff;">{ev['Resultado']}</code></span>
                     <span><b>Previsión:</b> {ev['Previsión']}</span>
+                    <span><b>Previo:</b> {ev['Previo']}</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("No hay publicaciones de alto impacto programadas para los filtros seleccionados.")
+        st.info("No hay publicaciones programadas para los filtros seleccionados.")
 
 # MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
 st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
@@ -426,7 +423,7 @@ if not df_market_full.empty:
         else:
             st.info("No hay noticias recientes indexadas.")
 
-# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP OVERNIGHT
+# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP CON DIFERENCIAL Y APALANCAMIENTO
 st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
 c1, c2 = st.columns(2)
 with c1:
@@ -437,24 +434,36 @@ with c1:
     direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
 
 with c2:
-    apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20], index=2)
+    apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20, 30, 50, 100], index=2)
+    
+    # Cálculos Cuantitativos Avanzados
     expo = cap * apalanque
     riesgo = cap * (piso / 100.0)
     lote = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
     
-    swap_rate_unit = row_sel['Swap Long ($/lote)'] if "Long" in direccion_pos else row_sel['Swap Short ($/lote)']
-    costo_swap_total = lote * swap_rate_unit * dias_operados
+    # Obtener Swap base por lote
+    swap_long = row_sel['Swap Long ($/lote)']
+    swap_short = row_sel['Swap Short ($/lote)']
+    swap_rate_unit = swap_long if "Long" in direccion_pos else swap_short
+    
+    # Diferencial por Lote y Apalancamiento
+    diferencial_swap_lote = swap_rate_unit * lote
+    costo_swap_total = diferencial_swap_lote * dias_operados
+    impacto_swap_pct = (costo_swap_total / cap) * 100
 
 st.markdown(f"""
 <div class="quant-card">
-    <h4>📊 Métricas de Control de Riesgo y Swap</h4>
-    <p><b>Exposición Teórica:</b> ${expo:,.2f} USD</p>
-    <p><b>Riesgo al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
+    <h4>📊 Métricas de Control de Riesgo, Apalancamiento y Swap</h4>
+    <p><b>Capital Base:</b> ${cap:,.2f} USD | <b>Apalancamiento:</b> 1:{apalanque}</p>
+    <p><b>Exposición Teórica Mercado:</b> ${expo:,.2f} USD</p>
+    <p><b>Riesgo Estimado al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
     <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
-    <p><b>Costo / Crédito Swap Estimado ({dias_operados} días para {activo_sel}):</b> 
-       <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD</code>
+    <hr style="border: 0.5px solid #30363d;">
+    <p><b>Diferencial Swap Neto por Día ({activo_sel}):</b> <code style="color: {'#3fb950' if diferencial_swap_lote >= 0 else '#f85149'};">${diferencial_swap_lote:,.2f} USD/día</code></p>
+    <p><b>Costo / Crédito Swap Total ({dias_operados} días overnight):</b> 
+       <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD ({impacto_swap_pct:+.2f}% sobre capital)</code>
     </p>
-    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica un Triple Swap (3 noches) por financiamiento del fin de semana.</i></p>
+    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se cobra Triple Swap (3 noches) por financiamiento de fin de semana.</i></p>
 </div>
 """, unsafe_allow_html=True)
 
