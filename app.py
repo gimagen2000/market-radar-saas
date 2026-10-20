@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
 import yfinance as yf
+import urllib.request
+import xml.etree.ElementTree as ET
+import urllib.parse
 
-# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
     page_title="Market Radar Quant Terminal",
     page_icon="📈",
@@ -10,7 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -18,7 +19,6 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
-    /* ESTILOS DE PUBLICIDAD MONETIZABLE */
     .ad-container {
         background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
         border: 1px dashed #e3b341;
@@ -41,7 +41,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
 if 'user_plan' not in st.session_state:
@@ -65,7 +64,6 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
-# --- BARRA LATERAL CON PUBLICIDAD ---
 st.sidebar.title("🔐 Licencia SaaS")
 user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
 selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
@@ -79,7 +77,6 @@ if st.sidebar.button("Validar Licencia"):
         st.session_state.user_plan = "Free"
     st.sidebar.success(f"Nivel Activo: {st.session_state.user_plan}")
 
-# BANNER PATROCINADO EN SIDEBAR
 if st.session_state.user_plan == "Free":
     st.sidebar.markdown("""
     <div class="ad-container">
@@ -90,21 +87,21 @@ if st.session_state.user_plan == "Free":
     """, unsafe_allow_html=True)
 
 ACTIVOS_TICKERS = {
-    "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)"},
-    "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)"},
-    "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)"},
-    "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)"},
-    "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral"},
-    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)"},
-    "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)"},
-    "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)"},
-    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral"},
-    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral"},
-    "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)"},
-    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)"},
-    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)"},
-    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)"},
-    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral"}
+    "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex"},
+    "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina"},
+    "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones"},
+    "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo"},
+    "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent"},
+    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado"},
+    "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion"},
+    "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion"},
+    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores"},
+    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa"},
+    "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion"},
+    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado"},
+    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa"},
+    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado"},
+    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura"}
 }
 
 @st.cache_data(ttl=300)
@@ -143,6 +140,31 @@ def obtener_datos_mercado_real():
             pass
     return pd.DataFrame(filas)
 
+def obtener_noticias_rss(query_termino):
+    noticias = []
+    try:
+        query_encoded = urllib.parse.quote(query_termino)
+        url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as response:
+            xml_data = response.read()
+            root = ET.fromstring(xml_data)
+            channel = root.find('channel')
+            if channel is not None:
+                for item in channel.findall('item')[:3]:
+                    title = item.find('title')
+                    link = item.find('link')
+                    source = item.find('source')
+                    
+                    noticias.append({
+                        "title": title.text if title is not None else "Sin título",
+                        "link": link.text if link is not None else "#",
+                        "publisher": source.text if source is not None else "Finanzas"
+                    })
+    except Exception:
+        pass
+    return noticias
+
 st.title("📊 Market Radar Quant Terminal")
 st.markdown("### Procesamiento Estadístico de Mercados, Cartera Completa y Noticias en Vivo")
 
@@ -160,7 +182,6 @@ def estilizar_condicion_pub(row):
         color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
     return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
-# MÓDULO 1: EXPLORADOR DE CARTERA
 st.header("1. Explorador de Cartera y Percentiles Anuales")
 col_f1, col_f2 = st.columns(2)
 with col_f1:
@@ -178,20 +199,17 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: MICHAEL VIRTUAL CON GATILLO PUBLICITARIO Y NOTICIAS REPARADAS
+# MÓDULO 2: MICHAEL VIRTUAL & NOTICIAS
 st.header("2. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
-
 if not df_market_full.empty:
-    activo_sel = st.selectbox("Seleccionar Activo para Tesis y Noticias", df_market_full["Activo"].tolist())
+    activo_sel = st.selectbox("Seleccionar Activo", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
-    ticker_sym = ACTIVOS_TICKERS[activo_sel]["ticker"]
+    query_busqueda = ACTIVOS_TICKERS[activo_sel]["query"]
 
     col_t1, col_t2 = st.columns([1.2, 1])
 
     with col_t1:
         if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
-            
-            # GATILLO MONETIZABLE EN LA TESIS
             if st.session_state.user_plan == "Free":
                 st.markdown("""
                 <div class="ad-container">
@@ -216,33 +234,16 @@ if not df_market_full.empty:
 
     with col_t2:
         st.markdown("#### 📰 Noticias del Mercado")
-        try:
-            t_obj = yf.Ticker(ticker_sym)
-            noticias = t_obj.news
-            if noticias:
-                count = 0
-                for n in noticias:
-                    # Lógica de extracción segura de URL de yfinance
-                    url_val = "#"
-                    if 'link' in n and n['link']:
-                        url_val = n['link']
-                    elif 'content' in n and isinstance(n['content'], dict):
-                        url_val = n['content'].get('clickThroughUrl', {}).get('url', '#')
-                    
-                    titulo = n.get('title', n.get('content', {}).get('title', 'Sin título'))
-                    publisher = n.get('publisher', n.get('content', {}).get('provider', {}).get('displayName', 'Fuente Financiera'))
-
-                    if titulo != 'Sin título' and count < 4:
-                        st.markdown(f"""
-                        <div class="news-box">
-                        <b>{publisher}:</b> <a href="{url_val}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{titulo} 🔗</a>
-                        </div>
-                        """, unsafe_allow_html=True)
-                        count += 1
-            else:
-                st.info("No hay noticias recientes indexadas para este ticker.")
-        except Exception:
-            st.info("Módulo de noticias temporalmente no disponible.")
+        noticias = obtener_noticias_rss(query_busqueda)
+        if noticias:
+            for n in noticias:
+                st.markdown(f"""
+                <div class="news-box">
+                <b>{n['publisher']}:</b> <a href="{n['link']}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{n['title']} 🔗</a>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No hay noticias recientes indexadas.")
 
 # MÓDULO 3: CALCULADORA DE RIESGO
 st.header("3. Calculadora de Exposición y Control de Riesgo")
