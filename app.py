@@ -4,6 +4,7 @@ import yfinance as yf
 import urllib.request
 import xml.etree.ElementTree as ET
 import urllib.parse
+from datetime import datetime, timedelta
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
@@ -39,7 +40,7 @@ def render_adsense(client_id, slot_id, height=100):
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
-# --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
+# --- ESTILOS CSS PROFESIONALES + ANUNCIOS Y TARJETAS MACRO ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -47,6 +48,35 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
+    
+    /* TARJETAS PARA EL CALENDARIO ECONÓMICO */
+    .cal-card {
+        background-color: #161b22;
+        padding: 14px 18px;
+        border-radius: 8px;
+        border-left: 4px solid #30363d;
+        border-top: 1px solid #21262d;
+        border-right: 1px solid #21262d;
+        border-bottom: 1px solid #21262d;
+        margin-bottom: 12px;
+    }
+    .cal-card-high { border-left-color: #f85149 !important; }
+    .cal-card-med { border-left-color: #d29922 !important; }
+    .cal-card-low { border-left-color: #2ea043 !important; }
+    
+    .cal-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #8b949e; margin-bottom: 6px; }
+    .cal-title { font-size: 15px; font-weight: bold; color: #f0f6fc; margin-bottom: 8px; }
+    .cal-metrics { display: flex; gap: 20px; font-size: 13px; color: #c9d1d9; }
+    .cal-badge {
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+    .badge-high { background-color: rgba(248, 81, 73, 0.2); color: #f85149; }
+    .badge-med { background-color: rgba(210, 153, 34, 0.2); color: #d29922; }
+    .badge-low { background-color: rgba(46, 160, 67, 0.2); color: #3fb950; }
+
     .ad-container {
         background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
         border: 1px dashed #e3b341;
@@ -259,146 +289,36 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: CALENDARIO ECONÓMICO Y EVENTOS MACRO
-st.header("2. 📅 Calendario Económico Global & Relevancia por País")
+# MÓDULO 2: CALENDARIO ECONÓMICO GLOBAL VISUAL
+st.header("2. 📅 Calendario Económico Global & Eventos Macro")
 
-col_cal1, col_cal2 = st.columns([1, 2])
+# Generador de Fechas Dinámicas para la Semana Actual
+hoy = datetime.now()
+fecha_hoy = hoy.strftime("%Y-%m-%d")
+fecha_manana = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
+fecha_pasado = (hoy + timedelta(days=2)).strftime("%Y-%m-%d")
+
+col_cal1, col_cal2 = st.columns([1, 2.2])
+
 with col_cal1:
-    pais_sel = st.selectbox("Seleccionar País / Región", ["Todos los Países", "EE.UU. (USD)", "Eurozona (EUR)", "Reino Unido (GBP)", "Japón (JPY)", "China (CNY)"])
-    impacto_sel = st.multiselect("Relevancia / Impacto", ["🔴 Alto Impacto (3 Estrellas)", "🟡 Impacto Medio (2 Estrellas)", "🟢 Bajo Impacto (1 Estrella)"], default=["🔴 Alto Impacto (3 Estrellas)", "🟡 Impacto Medio (2 Estrellas)"])
+    pais_sel = st.selectbox(
+        "Filtrar por País / Región", 
+        ["Todos los Países", "EE.UU. (USD)", "Eurozona (EUR)", "Reino Unido (GBP)", "Japón (JPY)", "China (CNY)", "Canadá (CAD)", "Australia (AUD)", "Suiza (CHF)", "Chile (CLP)", "Brasil (BRL)", "México (MXN)"]
+    )
+    impacto_sel = st.multiselect(
+        "Filtrar por Relevancia", 
+        ["🔴 Alto Impacto", "🟡 Impacto Medio", "🟢 Bajo Impacto"], 
+        default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
+    )
 
-# Muestra de eventos dinámicos estructurados
-eventos_ejemplo = [
-    {"Hora": "13:30 GMT", "País": "EE.UU. (USD)", "Evento": "Índice de Precios al Consumidor (IPC MoM)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "0.2%", "Previsión": "0.3%"},
-    {"Hora": "15:00 GMT", "País": "EE.UU. (USD)", "Evento": "Ventas de Viviendas Existentes", "Impacto": "🟡 Impacto Medio (2 Estrellas)", "Previo": "3.95M", "Previsión": "4.01M"},
-    {"Hora": "09:00 GMT", "País": "Eurozona (EUR)", "Evento": "IPC Zona Euro (YoY Final)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "2.2%", "Previsión": "2.2%"},
-    {"Hora": "06:00 GMT", "País": "Reino Unido (GBP)", "Evento": "Ventas al Por Menor (MoM)", "Impacto": "🟡 Impacto Medio (2 Estrellas)", "Previo": "0.6%", "Previsión": "0.4%"},
-    {"Hora": "23:30 GMT", "País": "Japón (JPY)", "Evento": "Tasa de Inflación Nacional (YoY)", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "2.8%", "Previsión": "2.7%"},
-    {"Hora": "01:30 GMT", "País": "China (CNY)", "Evento": "Tasa Preferencial de Préstamos del PBoC", "Impacto": "🔴 Alto Impacto (3 Estrellas)", "Previo": "3.35%", "Previsión": "3.35%"}
-]
-
-df_cal = pd.DataFrame(eventos_ejemplo)
-
-if pais_sel != "Todos los Países":
-    df_cal = df_cal[df_cal["País"] == pais_sel]
-
-if impacto_sel:
-    df_cal = df_cal[df_cal["Impacto"].isin(impacto_sel)]
-
-with col_cal2:
-    st.markdown("##### 📌 Publicaciones Macroeconómicas Programadas")
-    if not df_cal.empty:
-        st.dataframe(df_cal, use_container_width=True)
-    else:
-        st.info("No hay eventos que coincidan con los filtros seleccionados.")
-
-# MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
-st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
-if not df_market_full.empty:
-    activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
-    row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
-    query_busqueda = ACTIVOS_TICKERS[activo_sel]["query"]
-
-    col_t1, col_t2 = st.columns([1.2, 1])
-
-    with col_t1:
-        if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
-            if st.session_state.user_plan == "Free":
-                st.markdown(f"""
-                <div class="ad-container">
-                    <div class="ad-title">⚡ Patrocinado por Libertex</div>
-                    <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Deseas operar este activo con ejecución directa?</b></p>
-                    <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Operar esta Tesis en Libertex 🚀</a>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=120)
-
-            st.markdown(f"""
-            <div class="quant-card">
-            <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
-            <ul>
-                <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
-                <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
-                <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
-                <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
-                <li><b>Swap Diario Long:</b> <span style="color: {'#3fb950' if row_sel['Swap Long ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Long ($/lote)']} USD/lote</span></li>
-                <li><b>Swap Diario Short:</b> <span style="color: {'#3fb950' if row_sel['Swap Short ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Short ($/lote)']} USD/lote</span></li>
-            </ul>
-            <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-    with col_t2:
-        st.markdown("#### 📰 Noticias del Mercado")
-        noticias = obtener_noticias_rss(query_busqueda)
-        if noticias:
-            for n in noticias:
-                st.markdown(f"""
-                <div class="news-box">
-                <b>{n['publisher']}:</b> <a href="{n['link']}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{n['title']} 🔗</a>
-                </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.info("No hay noticias recientes indexadas.")
-
-# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP OVERNIGHT
-st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
-c1, c2 = st.columns(2)
-with c1:
-    cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
-    piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
-    pips_piso = st.number_input("Pips / Puntos al Piso Anual", value=250, step=10)
-    dias_operados = st.number_input("Días Estimados de Posición (Overnight)", value=5, min_value=1, step=1)
-    direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
-
-with c2:
-    apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20], index=2)
-    expo = cap * apalanque
-    riesgo = cap * (piso / 100.0)
-    lote = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
-    
-    # Obtención de Swap según dirección seleccionada
-    swap_rate_unit = row_sel['Swap Long ($/lote)'] if "Long" in direccion_pos else row_sel['Swap Short ($/lote)']
-    costo_swap_total = lote * swap_rate_unit * dias_operados
-
-st.markdown(f"""
-<div class="quant-card">
-    <h4>📊 Métricas de Control de Riesgo y Swap</h4>
-    <p><b>Exposición Teórica:</b> ${expo:,.2f} USD</p>
-    <p><b>Riesgo al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
-    <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
-    <p><b>Costo / Crédito Swap Estimado ({dias_operados} días para {activo_sel}):</b> 
-       <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD</code>
-    </p>
-    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica un Triple Swap (3 noches) por financiamiento del fin de semana.</i></p>
-</div>
-""", unsafe_allow_html=True)
-
-# MÓDULO 5: CANALES Y MEDIOS DE REFERENCIA
-st.header("5. 📺 Canales y Fuentes de Referencia Macroeconómica")
-st.markdown("""
-<div class="disclaimer-box" style="margin-bottom: 15px;">
-<b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y plataformas asociadas se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
-</div>
-""", unsafe_allow_html=True)
-
-col_yt1, col_yt2 = st.columns(2)
-
-with col_yt1:
-    st.markdown("""
-    <div class="quant-card" style="text-align: center; padding: 15px;">
-        <h4>🔴 Negocios TV</h4>
-        <p style="font-size: 13px; color: #8b949e;">Análisis geopolítico, macroeconomía, mercados globales y actualidad financiera en tiempo real.</p>
-        <a href="https://www.youtube.com/@negociostv" target="_blank" class="yt-button">Ver Canal Oficial 🚀</a>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_yt2:
-    st.markdown(f"""
-    <div class="quant-card" style="text-align: center; padding: 15px;">
-        <h4>📊 Recursos y Datos Globales</h4>
-        <p style="font-size: 13px; color: #8b949e;">Plataformas de gráficos avanzados, informes institucionales y seguimiento de flujos de capital.</p>
-        <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
-    </div>
-    """, unsafe_allow_html=True)
+# Lista Ampliada de Eventos Económicos Globales
+eventos_globales = [
+    {"Fecha": fecha_hoy, "Hora": "13:30 GMT", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Índice de Precios al Consumidor (IPC MoM)", "Impacto": "🔴 Alto Impacto", "Previo": "0.2%", "Previsión": "0.3%"},
+    {"Fecha": fecha_hoy, "Hora": "15:00 GMT", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Ventas de Viviendas Existentes", "Impacto": "🟡 Impacto Medio", "Previo": "3.95M", "Previsión": "4.01M"},
+    {"Fecha": fecha_hoy, "Hora": "09:00 GMT", "País": "Eurozona (EUR)", "Bandera": "🇪🇺", "Evento": "IPC Zona Euro (YoY Final)", "Impacto": "🔴 Alto Impacto", "Previo": "2.2%", "Previsión": "2.2%"},
+    {"Fecha": fecha_hoy, "Hora": "10:30 GMT", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Decisión de Tasa de Interés del Banco Central (BCCh)", "Impacto": "🔴 Alto Impacto", "Previo": "5.75%", "Previsión": "5.50%"},
+    {"Fecha": fecha_manana, "Hora": "06:00 GMT", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Ventas al Por Menor (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "0.6%", "Previsión": "0.4%"},
+    {"Fecha": fecha_manana, "Hora": "12:30 GMT", "País": "Canadá (CAD)", "Bandera": "🇨🇦", "Evento": "Ventas Minoristas Básicas (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "0.3%", "Previsión": "0.2%"},
+    {"Fecha": fecha_manana, "Hora": "13:00 GMT", "País": "Brasil (BRL)", "Bandera": "🇧🇷", "Evento": "Índice de Precios al Consumidor IPCA-15", "Impacto": "🔴 Alto Impacto", "Previo": "0.19%", "Previsión": "0.25%"},
+    {"Fecha": fecha_manana, "Hora": "23:30 GMT", "País": "Japón (JPY)", "Bandera": "🇯🇵", "Evento": "Tasa de Inflación Nacional (YoY)", "Impacto": "🔴 Alto Impacto", "Previo": "2.8%", "Previsión": "2.7%"},
+    {"Fecha": fecha_pasado, "Hora": "01:30 GMT", "País": "China (CNY)", "Bandera": "🇨🇳", "Evento": "Tasa Preferencial de
