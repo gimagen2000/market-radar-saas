@@ -13,6 +13,9 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- ENLACE DE AFILIADO DE MONETIZACIÓN ---
+LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
+
 # --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
 st.markdown("""
     <style>
@@ -53,7 +56,7 @@ if not st.session_state.tos_accepted:
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -82,11 +85,11 @@ if st.sidebar.button("Validar Licencia"):
     st.sidebar.success(f"Nivel Activo: {st.session_state.user_plan}")
 
 if st.session_state.user_plan == "Free":
-    st.sidebar.markdown("""
+    st.sidebar.markdown(f"""
     <div class="ad-container">
         <div class="ad-title">Anuncio Patrocinado</div>
-        <p style="font-size: 12px; color: #c9d1d9;">¿Buscas un Broker con bajos spreads para operar Long-Only?</p>
-        <a href="https://ftmo.com" target="_blank" class="ad-button">Abrir Cuenta de Pruebas</a>
+        <p style="font-size: 12px; color: #c9d1d9;">¿Buscas un Broker regulado para operar Long-Only con bajos spreads?</p>
+        <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Abrir Cuenta en Libertex 🚀</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -239,11 +242,11 @@ if not df_market_full.empty:
     with col_t1:
         if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
             if st.session_state.user_plan == "Free":
-                st.markdown("""
+                st.markdown(f"""
                 <div class="ad-container">
-                    <div class="ad-title">⚡ Patrocinado por Plataformas Afiliadas</div>
-                    <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Quieres ejecutar esta tesis sin pagar comisiones?</b></p>
-                    <a href="https://www.tradingview.com" target="_blank" class="ad-button">Ver Gráfico Profesional Gratis 🚀</a>
+                    <div class="ad-title">⚡ Patrocinado por Libertex</div>
+                    <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Deseas operar este activo con ejecución directa?</b></p>
+                    <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Operar esta Tesis en Libertex 🚀</a>
                 </div>
                 """, unsafe_allow_html=True)
 
