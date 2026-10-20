@@ -321,4 +321,149 @@ eventos_globales = [
     {"Fecha": fecha_manana, "Hora": "12:30 GMT", "País": "Canadá (CAD)", "Bandera": "🇨🇦", "Evento": "Ventas Minoristas Básicas (MoM)", "Impacto": "🟡 Impacto Medio", "Previo": "0.3%", "Previsión": "0.2%"},
     {"Fecha": fecha_manana, "Hora": "13:00 GMT", "País": "Brasil (BRL)", "Bandera": "🇧🇷", "Evento": "Índice de Precios al Consumidor IPCA-15", "Impacto": "🔴 Alto Impacto", "Previo": "0.19%", "Previsión": "0.25%"},
     {"Fecha": fecha_manana, "Hora": "23:30 GMT", "País": "Japón (JPY)", "Bandera": "🇯🇵", "Evento": "Tasa de Inflación Nacional (YoY)", "Impacto": "🔴 Alto Impacto", "Previo": "2.8%", "Previsión": "2.7%"},
-    {"Fecha": fecha_pasado, "Hora": "01:30 GMT", "País": "China (CNY)", "Bandera": "🇨🇳", "Evento": "Tasa Preferencial de
+    {"Fecha": fecha_pasado, "Hora": "01:30 GMT", "País": "China (CNY)", "Bandera": "🇨🇳", "Evento": "Tasa Preferencial de Préstamos del PBoC", "Impacto": "🔴 Alto Impacto", "Previo": "3.35%", "Previsión": "3.35%"},
+    {"Fecha": fecha_pasado, "Hora": "01:30 GMT", "País": "Australia (AUD)", "Bandera": "🇦🇺", "Evento": "Cambio en el Empleo", "Impacto": "🔴 Alto Impacto", "Previo": "58.2K", "Previsión": "25.0K"},
+    {"Fecha": fecha_pasado, "Hora": "07:30 GMT", "País": "Suiza (CHF)", "Bandera": "🇨🇭", "Evento": "Decisión de Tasa de Interés de la SNB", "Impacto": "🔴 Alto Impacto", "Previo": "1.25%", "Previsión": "1.00%"},
+    {"Fecha": fecha_pasado, "Hora": "12:00 GMT", "País": "México (MXN)", "Bandera": "🇲🇽", "Evento": "Decisión de Política Monetaria Banxico", "Impacto": "🔴 Alto Impacto", "Previo": "10.75%", "Previsión": "10.50%"}
+]
+
+# Filtrado dinámico
+eventos_filtrados = [
+    e for e in eventos_globales 
+    if (pais_sel == "Todos los Países" or e["País"] == pais_sel)
+    and (not impacto_sel or e["Impacto"] in impacto_sel)
+]
+
+with col_cal2:
+    st.markdown("##### 📌 Publicaciones Macroeconómicas Destacadas")
+    if eventos_filtrados:
+        for ev in eventos_filtrados:
+            # Asignación de clase CSS según impacto
+            card_class = "cal-card-high" if "🔴" in ev["Impacto"] else ("cal-card-med" if "🟡" in ev["Impacto"] else "cal-card-low")
+            badge_class = "badge-high" if "🔴" in ev["Impacto"] else ("badge-med" if "🟡" in ev["Impacto"] else "badge-low")
+            
+            st.markdown(f"""
+            <div class="cal-card {card_class}">
+                <div class="cal-header">
+                    <span>🗓️ <b>{ev['Fecha']}</b> | ⏰ {ev['Hora']}</span>
+                    <span class="cal-badge {badge_class}">{ev['Impacto']}</span>
+                </div>
+                <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Evento']}</div>
+                <div class="cal-metrics">
+                    <span><b>Previo:</b> {ev['Previo']}</span>
+                    <span><b>Previsión:</b> {ev['Previsión']}</span>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        st.info("No hay eventos programados que coincidan con los filtros seleccionados.")
+
+# MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
+st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
+if not df_market_full.empty:
+    activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
+    row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
+    query_busqueda = ACTIVOS_TICKERS[activo_sel]["query"]
+
+    col_t1, col_t2 = st.columns([1.2, 1])
+
+    with col_t1:
+        if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
+            if st.session_state.user_plan == "Free":
+                st.markdown(f"""
+                <div class="ad-container">
+                    <div class="ad-title">⚡ Patrocinado por Libertex</div>
+                    <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Deseas operar este activo con ejecución directa?</b></p>
+                    <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Operar esta Tesis en Libertex 🚀</a>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=120)
+
+            st.markdown(f"""
+            <div class="quant-card">
+            <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
+            <ul>
+                <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
+                <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
+                <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
+                <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
+                <li><b>Swap Diario Long:</b> <span style="color: {'#3fb950' if row_sel['Swap Long ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Long ($/lote)']} USD/lote</span></li>
+                <li><b>Swap Diario Short:</b> <span style="color: {'#3fb950' if row_sel['Swap Short ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Short ($/lote)']} USD/lote</span></li>
+            </ul>
+            <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    with col_t2:
+        st.markdown("#### 📰 Noticias del Mercado")
+        noticias = obtener_noticias_rss(query_busqueda)
+        if noticias:
+            for n in noticias:
+                st.markdown(f"""
+                <div class="news-box">
+                <b>{n['publisher']}:</b> <a href="{n['link']}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{n['title']} 🔗</a>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No hay noticias recientes indexadas.")
+
+# MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP OVERNIGHT
+st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
+c1, c2 = st.columns(2)
+with c1:
+    cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
+    piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
+    pips_piso = st.number_input("Pips / Puntos al Piso Anual", value=250, step=10)
+    dias_operados = st.number_input("Días Estimados de Posición (Overnight)", value=5, min_value=1, step=1)
+    direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
+
+with c2:
+    apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20], index=2)
+    expo = cap * apalanque
+    riesgo = cap * (piso / 100.0)
+    lote = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
+    
+    swap_rate_unit = row_sel['Swap Long ($/lote)'] if "Long" in direccion_pos else row_sel['Swap Short ($/lote)']
+    costo_swap_total = lote * swap_rate_unit * dias_operados
+
+st.markdown(f"""
+<div class="quant-card">
+    <h4>📊 Métricas de Control de Riesgo y Swap</h4>
+    <p><b>Exposición Teórica:</b> ${expo:,.2f} USD</p>
+    <p><b>Riesgo al Piso Anual ({piso}%):</b> ${riesgo:,.2f} USD</p>
+    <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
+    <p><b>Costo / Crédito Swap Estimado ({dias_operados} días para {activo_sel}):</b> 
+       <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD</code>
+    </p>
+    <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica un Triple Swap (3 noches) por financiamiento del fin de semana.</i></p>
+</div>
+""", unsafe_allow_html=True)
+
+# MÓDULO 5: CANALES Y MEDIOS DE REFERENCIA
+st.header("5. 📺 Canales y Fuentes de Referencia Macroeconómica")
+st.markdown("""
+<div class="disclaimer-box" style="margin-bottom: 15px;">
+<b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y plataformas asociadas se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
+</div>
+""", unsafe_allow_html=True)
+
+col_yt1, col_yt2 = st.columns(2)
+
+with col_yt1:
+    st.markdown("""
+    <div class="quant-card" style="text-align: center; padding: 15px;">
+        <h4>🔴 Negocios TV</h4>
+        <p style="font-size: 13px; color: #8b949e;">Análisis geopolítico, macroeconomía, mercados globales y actualidad financiera en tiempo real.</p>
+        <a href="https://www.youtube.com/@negociostv" target="_blank" class="yt-button">Ver Canal Oficial 🚀</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_yt2:
+    st.markdown(f"""
+    <div class="quant-card" style="text-align: center; padding: 15px;">
+        <h4>📊 Recursos y Datos Globales</h4>
+        <p style="font-size: 13px; color: #8b949e;">Plataformas de gráficos avanzados, informes institucionales y seguimiento de flujos de capital.</p>
+        <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
+    </div>
+    """, unsafe_allow_html=True)
