@@ -35,8 +35,9 @@ def render_adsense(client_id, slot_id, height=100):
     """
     st.components.v1.html(adsense_code, height=height)
 
-# --- ENLACE DE AFILIADO DE MONETIZACIÓN LIBERTEX ---
+# --- ENLACES DE AFILIADOS / MONETIZACIÓN ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
+TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
 # --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
 st.markdown("""
@@ -325,11 +326,11 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# MÓDULO 4: CANALES Y MEDIOS DE REFERENCIA (NEGOCIOS TV, ETC.)
+# MÓDULO 4: CANALES Y MEDIOS DE REFERENCIA
 st.header("4. 📺 Canales y Fuentes de Referencia Macroeconómica")
 st.markdown("""
 <div class="disclaimer-box" style="margin-bottom: 15px;">
-<b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y canales de YouTube (como Negocios TV) se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
+<b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y plataformas asociadas se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
 </div>
 """, unsafe_allow_html=True)
 
@@ -345,10 +346,10 @@ with col_yt1:
     """, unsafe_allow_html=True)
 
 with col_yt2:
-    st.markdown("""
+    st.markdown(f"""
     <div class="quant-card" style="text-align: center; padding: 15px;">
         <h4>📊 Recursos y Datos Globales</h4>
         <p style="font-size: 13px; color: #8b949e;">Plataformas de gráficos avanzados, informes institucionales y seguimiento de flujos de capital.</p>
-        <a href="https://www.tradingview.com" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
+        <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
     </div>
     """, unsafe_allow_html=True)
