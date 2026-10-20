@@ -5,6 +5,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import urllib.parse
 
+# --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(
     page_title="Market Radar Quant Terminal",
     page_icon="📈",
@@ -12,6 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -41,6 +43,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
 if 'user_plan' not in st.session_state:
@@ -64,6 +67,7 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
+# --- BARRA LATERAL CON MONETIZACIÓN ---
 st.sidebar.title("🔐 Licencia SaaS")
 user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
 selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
@@ -86,22 +90,46 @@ if st.session_state.user_plan == "Free":
     </div>
     """, unsafe_allow_html=True)
 
+# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
 ACTIVOS_TICKERS = {
+    # Forex Majors & Crosses
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex"},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina"},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones"},
+    "AUD/USD": {"ticker": "AUDUSD=X", "clase": "Forex", "cot": "Neto Comprador (+5k)", "query": "AUD USD australian dollar"},
+    "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense"},
+    "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar"},
+    "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo"},
+    
+    # Índices Globales
+    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores"},
+    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa"},
+    "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial"},
+    "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt"},
+    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock"},
+    "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo"},
+    
+    # Energía y Metales
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo"},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent"},
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado"},
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion"},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion"},
-    "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores"},
-    "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa"},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion"},
+    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado"},
+    
+    # Softs & Agriculture (Agrícolas)
     "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado"},
     "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa"},
     "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado"},
-    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura"}
+    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura"},
+    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa"},
+    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado"},
+    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado"},
+    
+    # Criptomonedas Principales
+    "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio"},
+    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto"}
 }
 
 @st.cache_data(ttl=300)
@@ -166,9 +194,9 @@ def obtener_noticias_rss(query_termino):
     return noticias
 
 st.title("📊 Market Radar Quant Terminal")
-st.markdown("### Procesamiento Estadístico de Mercados, Cartera Completa y Noticias en Vivo")
+st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
 
-with st.spinner("Actualizando cotizaciones en vivo..."):
+with st.spinner("Actualizando cotizaciones globales en vivo..."):
     df_market_full = obtener_datos_mercado_real()
 
 def estilizar_condicion_pub(row):
@@ -182,7 +210,7 @@ def estilizar_condicion_pub(row):
         color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
     return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
-st.header("1. Explorador de Cartera y Percentiles Anuales")
+st.header("1. Explorador de Cartera Global y Percentiles Anuales")
 col_f1, col_f2 = st.columns(2)
 with col_f1:
     vista_cartera = st.radio("Modo de Visualización", ["Solo Activos en Percentil Bajo (≤ 20%)", "Ver Cartera Completa"])
@@ -202,7 +230,7 @@ else:
 # MÓDULO 2: MICHAEL VIRTUAL & NOTICIAS
 st.header("2. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
 if not df_market_full.empty:
-    activo_sel = st.selectbox("Seleccionar Activo", df_market_full["Activo"].tolist())
+    activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
     query_busqueda = ACTIVOS_TICKERS[activo_sel]["query"]
 
