@@ -13,7 +13,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ENLACE DE AFILIADO DE MONETIZACIÓN ---
+# --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
+ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"  # Reemplaza con tu Client ID real
+ADSENSE_SLOT_ID = "YYYYYYYYYY"               # Reemplaza con tu Slot ID real
+
+def render_adsense(client_id, slot_id, height=100):
+    adsense_code = f"""
+    <div style="text-align: center;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={client_id}"
+             crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="{client_id}"
+             data-ad-slot="{slot_id}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({{}});
+        </script>
+    </div>
+    """
+    st.components.v1.html(adsense_code, height=height)
+
+# --- ENLACE DE AFILIADO DE MONETIZACIÓN LIBERTEX ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 
 # --- ESTILOS CSS PROFESIONALES + ANUNCIOS ---
@@ -43,6 +65,16 @@ st.markdown("""
         display: inline-block;
         margin-top: 8px;
     }
+    .yt-button {
+        background-color: #FF0000;
+        color: white !important;
+        padding: 6px 14px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 5px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -56,7 +88,7 @@ if not st.session_state.tos_accepted:
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -92,10 +124,12 @@ if st.session_state.user_plan == "Free":
         <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Abrir Cuenta en Libertex 🚀</a>
     </div>
     """, unsafe_allow_html=True)
+    
+    with st.sidebar:
+        render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
 
 # --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
 ACTIVOS_TICKERS = {
-    # Forex Majors & Crosses
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex"},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina"},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones"},
@@ -103,16 +137,12 @@ ACTIVOS_TICKERS = {
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense"},
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar"},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo"},
-    
-    # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores"},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa"},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial"},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt"},
     "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock"},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo"},
-    
-    # Energía y Metales
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo"},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent"},
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado"},
@@ -120,8 +150,6 @@ ACTIVOS_TICKERS = {
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion"},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion"},
     "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado"},
-    
-    # Softs & Agriculture (Agrícolas)
     "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado"},
     "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa"},
     "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado"},
@@ -129,8 +157,6 @@ ACTIVOS_TICKERS = {
     "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa"},
     "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado"},
     "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado"},
-    
-    # Criptomonedas Principales
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio"},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto"}
 }
@@ -249,6 +275,8 @@ if not df_market_full.empty:
                     <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Operar esta Tesis en Libertex 🚀</a>
                 </div>
                 """, unsafe_allow_html=True)
+                
+                render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=120)
 
             st.markdown(f"""
             <div class="quant-card">
@@ -296,3 +324,31 @@ st.markdown(f"""
     <p><b>Dimensionamiento Sugerido:</b> <code>{lote:.2f} Lotes</code></p>
 </div>
 """, unsafe_allow_html=True)
+
+# MÓDULO 4: CANALES Y MEDIOS DE REFERENCIA (NEGOCIOS TV, ETC.)
+st.header("4. 📺 Canales y Fuentes de Referencia Macroeconómica")
+st.markdown("""
+<div class="disclaimer-box" style="margin-bottom: 15px;">
+<b>Nota legal sobre enlaces externos:</b> Los enlaces a medios de comunicación y canales de YouTube (como Negocios TV) se proporcionan exclusivamente con fines informativos y de contexto educativo. Market Radar Quant Terminal no mantiene afiliación directa ni se hace responsable por los análisis emitidos por terceros.
+</div>
+""", unsafe_allow_html=True)
+
+col_yt1, col_yt2 = st.columns(2)
+
+with col_yt1:
+    st.markdown("""
+    <div class="quant-card" style="text-align: center; padding: 15px;">
+        <h4>🔴 Negocios TV</h4>
+        <p style="font-size: 13px; color: #8b949e;">Análisis geopolítico, macroeconomía, mercados globales y actualidad financiera en tiempo real.</p>
+        <a href="https://www.youtube.com/@negociostv" target="_blank" class="yt-button">Ver Canal Oficial 🚀</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_yt2:
+    st.markdown("""
+    <div class="quant-card" style="text-align: center; padding: 15px;">
+        <h4>📊 Recursos y Datos Globales</h4>
+        <p style="font-size: 13px; color: #8b949e;">Plataformas de gráficos avanzados, informes institucionales y seguimiento de flujos de capital.</p>
+        <a href="https://www.tradingview.com" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
+    </div>
+    """, unsafe_allow_html=True)
