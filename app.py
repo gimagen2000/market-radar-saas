@@ -289,19 +289,25 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA
+# MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (GLOBAL INSTITUCIONAL)
 st.header("2. 📊 Datos Económicos Relevantes de la Semana")
 
+# Cálculo automático de Rango Semanal (Lunes a Viernes de la semana en curso)
 hoy = datetime.now()
-fecha_hoy_str = hoy.strftime("%Y-%m-%d")
-fecha_manana_str = (hoy + timedelta(days=1)).strftime("%Y-%m-%d")
+inicio_semana = hoy - timedelta(days=hoy.weekday())
+fin_semana = inicio_semana + timedelta(days=4)
+
+str_inicio_sem = inicio_semana.strftime("%d/%m/%Y")
+str_fin_sem = fin_semana.strftime("%d/%m/%Y")
+
+st.caption(f"🗓️ **Semana en Curso:** {str_inicio_sem} al {str_fin_sem} | Cobertura Macroeconómica Global")
 
 ZONAS_HORARIAS = {
-    "Chile / Santiago (CLT)": -3,
     "GMT / UTC (Tiempo Universal)": 0,
     "Nueva York / Wall St (EDT)": -4,
     "Londres (BST)": 1,
     "Madrid / Europa Central (CEST)": 2,
+    "Chile / Santiago (CLT)": -3,
     "Buenos Aires (ART)": -3,
     "Ciudad de México (CST)": -6
 }
@@ -319,91 +325,128 @@ def ajustar_hora(hora_gmt_str, offset_horas):
 col_cal1, col_cal2 = st.columns([1, 2.2])
 
 with col_cal1:
-    zona_horaria_sel = st.selectbox("🌐 Zona Horaria", list(ZONAS_HORARIAS.keys()), index=0)
-    offset_sel = ZONAS_HORARIAS[zona_horaria_sel]
-    
     pais_sel = st.selectbox(
-        "Filtrar por País / Región", 
-        ["Todos los Países", "EE.UU. (USD)", "Eurozona (EUR)", "Reino Unido (GBP)", "Japón (JPY)", "China (CNY)", "Canadá (CAD)", "Australia (AUD)", "Suiza (CHF)", "Chile (CLP)", "Brasil (BRL)", "México (MXN)"]
+        "Filtrar por Economía / Región", 
+        [
+            "Todas las Economías Clave", 
+            "Estados Unidos (USD)", 
+            "Eurozona (EUR)", 
+            "Alemania (EUR)", 
+            "Francia (EUR)", 
+            "España (EUR)", 
+            "Reino Unido (GBP)", 
+            "Suiza (CHF)", 
+            "China (CNY)", 
+            "Japón (JPY)", 
+            "Canadá (CAD)", 
+            "Australia (AUD)"
+        ]
     )
     impacto_sel = st.multiselect(
-        "Filtrar por Relevancia", 
+        "Relevancia de Impacto", 
         ["🔴 Alto Impacto", "🟡 Impacto Medio", "🟢 Bajo Impacto"], 
         default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
     )
+    zona_horaria_sel = st.selectbox("🌐 Ajuste de Hora Local", list(ZONAS_HORARIAS.keys()), index=0)
+    offset_sel = ZONAS_HORARIAS[zona_horaria_sel]
 
-# Estructura de Datos Macroeconómicos Relevantes: Dato Anterior, Esperado y Resultado Publicado
+# Catálogo Macroeconómico de la Semana (Jerarquizado por importancia global)
 eventos_semana_relevantes = [
+    # ESTADOS UNIDOS (USD)
     {
-        "Fecha": fecha_hoy_str, 
-        "Día": "Miércoles", 
-        "Hora_GMT": "14:30", 
-        "País": "EE.UU. (USD)", 
-        "Bandera": "🇺🇸", 
-        "Indicador": "Inventarios de PetPetróleo Crudo EIA", 
+        "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
+        "Día": "Miércoles", "Hora_GMT": "14:30", 
+        "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
+        "Indicador": "Inventarios de Petróleo Crudo de la EIA", 
         "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "2.10M", 
-        "Dato_Esperado": "1.80M", 
-        "Dato_Publicado": "Pendiente ⏳"
+        "Dato_Anterior": "2.10M", "Dato_Esperado": "1.80M", "Dato_Publicado": "Pendiente ⏳"
     },
     {
-        "Fecha": fecha_hoy_str, 
-        "Día": "Miércoles", 
-        "Hora_GMT": "07:00", 
-        "País": "Reino Unido (GBP)", 
-        "Bandera": "🇬🇧", 
-        "Indicador": "IPC Inflación Anual (YoY)", 
-        "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "2.2%", 
-        "Dato_Esperado": "2.1%", 
-        "Dato_Publicado": "2.2%"
-    },
-    {
-        "Fecha": fecha_manana_str, 
-        "Día": "Jueves", 
-        "Hora_GMT": "12:30", 
-        "País": "EE.UU. (USD)", 
-        "Bandera": "🇺🇸", 
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "12:30", 
+        "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
         "Indicador": "Nuevas Peticiones de Subsidio por Desempleo", 
         "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "241K", 
-        "Dato_Esperado": "243K", 
-        "Dato_Publicado": "Pendiente ⏳"
+        "Dato_Anterior": "241K", "Dato_Esperado": "243K", "Dato_Publicado": "Pendiente ⏳"
     },
     {
-        "Fecha": "2026-10-27", 
-        "Día": "Lunes 27 Oct", 
-        "Hora_GMT": "21:00", 
-        "País": "Chile (CLP)", 
-        "Bandera": "🇨🇱", 
-        "Indicador": "Decisión de Tasa de Interés BCCh (RPM)", 
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "13:45", 
+        "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
+        "Indicador": "PMI Flash Manufacturero / Servicios de S&P Global", 
         "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "4.50%", 
-        "Dato_Esperado": "4.25%", 
-        "Dato_Publicado": "Pendiente ⏳"
+        "Dato_Anterior": "52.0", "Dato_Esperado": "51.8", "Dato_Publicado": "Pendiente ⏳"
+    },
+    # EUROZONA & PRINCIPALES POTENCIAS EUROPEAS (EUR)
+    {
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "07:30", 
+        "País": "Alemania (EUR)", "Bandera": "🇩🇪", 
+        "Indicador": "PMI Manufacturero de Alemania (HCOB)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "40.6", "Dato_Esperado": "40.8", "Dato_Publicado": "Pendiente ⏳"
     },
     {
-        "Fecha": "2026-10-30", 
-        "Día": "Viernes 30 Oct", 
-        "Hora_GMT": "12:00", 
-        "País": "Chile (CLP)", 
-        "Bandera": "🇨🇱", 
-        "Indicador": "Tasa de Desempleo Trimestral INE", 
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "07:15", 
+        "País": "Francia (EUR)", "Bandera": "🇫🇷", 
+        "Indicador": "PMI Flash del Sector Servicios (HCOB)", 
+        "Impacto": "🟡 Impacto Medio", 
+        "Dato_Anterior": "49.6", "Dato_Esperado": "49.8", "Dato_Publicado": "Pendiente ⏳"
+    },
+    {
+        "Fecha": (inicio_semana + timedelta(days=4)).strftime("%Y-%m-%d"), 
+        "Día": "Viernes", "Hora_GMT": "07:00", 
+        "País": "España (EUR)", "Bandera": "🇪🇸", 
+        "Indicador": "Índice de Precios al Consumidor IPC (YoY Preliminar)", 
         "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "8.7%", 
-        "Dato_Esperado": "8.4%", 
-        "Dato_Publicado": "Pendiente ⏳"
+        "Dato_Anterior": "1.5%", "Dato_Esperado": "1.7%", "Dato_Publicado": "Pendiente ⏳"
+    },
+    # REINO UNIDO (GBP)
+    {
+        "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
+        "Día": "Miércoles", "Hora_GMT": "06:00", 
+        "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", 
+        "Indicador": "Índice de Precios al Consumidor IPC (YoY)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "2.2%", "Dato_Esperado": "2.1%", "Dato_Publicado": "2.2%"
+    },
+    # SUIZA (CHF)
+    {
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "06:00", 
+        "País": "Suiza (CHF)", "Bandera": "🇨🇭", 
+        "Indicador": "Balanza Comercial y Exportaciones Suizas", 
+        "Impacto": "🟡 Impacto Medio", 
+        "Dato_Anterior": "4.21B", "Dato_Esperado": "4.15B", "Dato_Publicado": "Pendiente ⏳"
+    },
+    # CHINA (CNY)
+    {
+        "Fecha": (inicio_semana + timedelta(days=0)).strftime("%Y-%m-%d"), 
+        "Día": "Lunes", "Hora_GMT": "01:15", 
+        "País": "China (CNY)", "Bandera": "🇨🇳", 
+        "Indicador": "Tasa Preferencial de Préstamos del PBoC (1 Año)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "3.35%", "Dato_Esperado": "3.10%", "Dato_Publicado": "3.10%"
+    },
+    # JAPÓN (JPY)
+    {
+        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+        "Día": "Jueves", "Hora_GMT": "23:30", 
+        "País": "Japón (JPY)", "Bandera": "🇯🇵", 
+        "Indicador": "IPC Subyacente de Tokio (YoY)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "2.0%", "Dato_Esperado": "1.7%", "Dato_Publicado": "Pendiente ⏳"
     }
 ]
 
 eventos_filtrados = [
     e for e in eventos_semana_relevantes 
-    if (pais_sel == "Todos los Países" or e["País"] == pais_sel)
+    if (pais_sel == "Todas las Economías Clave" or e["País"] == pais_sel)
     and (not impacto_sel or e["Impacto"] in impacto_sel)
 ]
 
 with col_cal2:
-    st.markdown(f"##### 📌 Indicadores Macroeconómicos Clave ({zona_horaria_sel})")
     if eventos_filtrados:
         for ev in eventos_filtrados:
             hora_ajustada = ajustar_hora(ev["Hora_GMT"], offset_sel)
@@ -425,7 +468,7 @@ with col_cal2:
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("No hay datos macroeconómicos programados para los filtros seleccionados.")
+        st.info("No hay datos macroeconómicos filtrados para los criterios seleccionados.")
 
 # MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
 st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
