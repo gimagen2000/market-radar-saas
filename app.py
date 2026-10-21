@@ -49,7 +49,7 @@ st.markdown("""
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
     
-    /* TARJETAS PARA EL CALENDARIO ECONÓMICO */
+    /* TARJETAS PARA DATOS ECONÓMICOS DE LA SEMANA */
     .cal-card {
         background-color: #161b22;
         padding: 14px 18px;
@@ -289,8 +289,8 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: CALENDARIO ECONÓMICO REAL CON DATO / RESULTADO PUBLICADO
-st.header("2. 📅 Calendario Económico Global & Eventos Macro")
+# MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA
+st.header("2. 📊 Datos Económicos Relevantes de la Semana")
 
 hoy = datetime.now()
 fecha_hoy_str = hoy.strftime("%Y-%m-%d")
@@ -332,24 +332,78 @@ with col_cal1:
         default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
     )
 
-# Eventos Macroeconómicos Precisos
-eventos_globales_reales = [
-    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "12:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Permisos de Construcción (MoM)", "Impacto": "🟡 Impacto Medio", "Resultado": "1.42M", "Previsión": "1.45M", "Previo": "1.47M"},
-    {"Fecha": fecha_hoy_str, "Día": "Martes", "Hora_GMT": "18:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Reservas Semanales de Crudo del API", "Impacto": "🟡 Impacto Medio", "Resultado": "-0.80M", "Previsión": "-0.50M", "Previo": "-1.20M"},
-    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "07:00", "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", "Evento": "Índice de Precios al Consumidor (IPC YoY)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "2.1%", "Previo": "2.2%"},
-    {"Fecha": fecha_manana_str, "Día": "Miércoles", "Hora_GMT": "14:30", "País": "EE.UU. (USD)", "Bandera": "🇺🇸", "Evento": "Inventarios de Petróleo Crudo de la EIA", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "1.80M", "Previo": "2.10M"},
-    {"Fecha": "2026-10-27", "Día": "Lunes 27 Oct", "Hora_GMT": "21:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Reunión de Política Monetaria (RPM BCCh)", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "4.25%", "Previo": "4.50%"},
-    {"Fecha": "2026-10-30", "Día": "Viernes 30 Oct", "Hora_GMT": "12:00", "País": "Chile (CLP)", "Bandera": "🇨🇱", "Evento": "Tasa de Desempleo INE Chile", "Impacto": "🔴 Alto Impacto", "Resultado": "Pendiente ⏳", "Previsión": "8.4%", "Previo": "8.7%"}
+# Estructura de Datos Macroeconómicos Relevantes: Dato Anterior, Esperado y Resultado Publicado
+eventos_semana_relevantes = [
+    {
+        "Fecha": fecha_hoy_str, 
+        "Día": "Miércoles", 
+        "Hora_GMT": "14:30", 
+        "País": "EE.UU. (USD)", 
+        "Bandera": "🇺🇸", 
+        "Indicador": "Inventarios de PetPetróleo Crudo EIA", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "2.10M", 
+        "Dato_Esperado": "1.80M", 
+        "Dato_Publicado": "Pendiente ⏳"
+    },
+    {
+        "Fecha": fecha_hoy_str, 
+        "Día": "Miércoles", 
+        "Hora_GMT": "07:00", 
+        "País": "Reino Unido (GBP)", 
+        "Bandera": "🇬🇧", 
+        "Indicador": "IPC Inflación Anual (YoY)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "2.2%", 
+        "Dato_Esperado": "2.1%", 
+        "Dato_Publicado": "2.2%"
+    },
+    {
+        "Fecha": fecha_manana_str, 
+        "Día": "Jueves", 
+        "Hora_GMT": "12:30", 
+        "País": "EE.UU. (USD)", 
+        "Bandera": "🇺🇸", 
+        "Indicador": "Nuevas Peticiones de Subsidio por Desempleo", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "241K", 
+        "Dato_Esperado": "243K", 
+        "Dato_Publicado": "Pendiente ⏳"
+    },
+    {
+        "Fecha": "2026-10-27", 
+        "Día": "Lunes 27 Oct", 
+        "Hora_GMT": "21:00", 
+        "País": "Chile (CLP)", 
+        "Bandera": "🇨🇱", 
+        "Indicador": "Decisión de Tasa de Interés BCCh (RPM)", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "4.50%", 
+        "Dato_Esperado": "4.25%", 
+        "Dato_Publicado": "Pendiente ⏳"
+    },
+    {
+        "Fecha": "2026-10-30", 
+        "Día": "Viernes 30 Oct", 
+        "Hora_GMT": "12:00", 
+        "País": "Chile (CLP)", 
+        "Bandera": "🇨🇱", 
+        "Indicador": "Tasa de Desempleo Trimestral INE", 
+        "Impacto": "🔴 Alto Impacto", 
+        "Dato_Anterior": "8.7%", 
+        "Dato_Esperado": "8.4%", 
+        "Dato_Publicado": "Pendiente ⏳"
+    }
 ]
 
 eventos_filtrados = [
-    e for e in eventos_globales_reales 
+    e for e in eventos_semana_relevantes 
     if (pais_sel == "Todos los Países" or e["País"] == pais_sel)
     and (not impacto_sel or e["Impacto"] in impacto_sel)
 ]
 
 with col_cal2:
-    st.markdown(f"##### 📌 Agenda Económica Oficial ({zona_horaria_sel})")
+    st.markdown(f"##### 📌 Indicadores Macroeconómicos Clave ({zona_horaria_sel})")
     if eventos_filtrados:
         for ev in eventos_filtrados:
             hora_ajustada = ajustar_hora(ev["Hora_GMT"], offset_sel)
@@ -362,16 +416,16 @@ with col_cal2:
                     <span>🗓️ <b>{ev['Día']} {ev['Fecha']}</b> | ⏰ <b>{hora_ajustada} hrs</b></span>
                     <span class="cal-badge {badge_class}">{ev['Impacto']}</span>
                 </div>
-                <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Evento']}</div>
+                <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Indicador']}</div>
                 <div class="cal-metrics">
-                    <span><b>Resultado (Actual):</b> <code style="color: #58a6ff;">{ev['Resultado']}</code></span>
-                    <span><b>Previsión:</b> {ev['Previsión']}</span>
-                    <span><b>Previo:</b> {ev['Previo']}</span>
+                    <span><b>1. Dato Anterior (Previo):</b> <code>{ev['Dato_Anterior']}</code></span>
+                    <span><b>2. Dato Esperado (Previsión):</b> <code>{ev['Dato_Esperado']}</code></span>
+                    <span><b>3. Dato Publicado (Actual):</b> <code style="color: #58a6ff; font-weight: bold;">{ev['Dato_Publicado']}</code></span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("No hay publicaciones programadas para los filtros seleccionados.")
+        st.info("No hay datos macroeconómicos programados para los filtros seleccionados.")
 
 # MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
 st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
