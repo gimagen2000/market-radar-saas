@@ -159,8 +159,9 @@ if st.session_state.user_plan == "Free":
     with st.sidebar:
         render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
 
-# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES CON VALORES SWAP ---
+# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES (CON FOREX EXTENDIDO) ---
 ACTIVOS_TICKERS = {
+    # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
@@ -168,12 +169,38 @@ ACTIVOS_TICKERS = {
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
+
+    # Forex Minors / Cruces
+    "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
+    "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
+    "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
+    "AUD/JPY": {"ticker": "AUDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "AUD JPY australiano yen", "swap_long": 2.5, "swap_short": -4.1},
+    "NZD/JPY": {"ticker": "NZDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "NZD JPY neozelandes yen", "swap_long": 2.2, "swap_short": -3.8},
+    "CAD/JPY": {"ticker": "CADJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CAD JPY canadiense yen", "swap_long": 3.0, "swap_short": -4.9},
+    "CHF/JPY": {"ticker": "CHFJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CHF JPY franco yen", "swap_long": 1.8, "swap_short": -3.5},
+    "EUR/AUD": {"ticker": "EURAUD=X", "clase": "Forex", "cot": "Neutral", "query": "EUR AUD euro australiano", "swap_long": -4.2, "swap_short": 1.5},
+    "EUR/CAD": {"ticker": "EURCAD=X", "clase": "Forex", "cot": "Neutral", "query": "EUR CAD euro canadiense", "swap_long": -2.9, "swap_short": 0.8},
+    "GBP/AUD": {"ticker": "GBPAUD=X", "clase": "Forex", "cot": "Neutral", "query": "GBP AUD libra australiano", "swap_long": -3.8, "swap_short": 1.1},
+    "GBP/CAD": {"ticker": "GBPCAD=X", "clase": "Forex", "cot": "Neutral", "query": "GBP CAD libra canadiense", "swap_long": -2.4, "swap_short": 0.6},
+
+    # Forex Emergentes & LATAM
+    "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
+    "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
+    "USD/BRL": {"ticker": "USDBRL=X", "clase": "Forex", "cot": "Neutral", "query": "USD BRL dolar real brasileno", "swap_long": 10.5, "swap_short": -14.0},
+    "USD/ZAR": {"ticker": "USDZAR=X", "clase": "Forex", "cot": "Neutral", "query": "USD ZAR dolar rand sudafricano", "swap_long": 9.2, "swap_short": -12.8},
+    "USD/TRY": {"ticker": "USDTRY=X", "clase": "Forex", "cot": "Neutral", "query": "USD TRY dolar lira turca", "swap_long": 25.0, "swap_short": -38.0},
+    "USD/SEK": {"ticker": "USDSEK=X", "clase": "Forex", "cot": "Neutral", "query": "USD SEK dolar corona sueca", "swap_long": 1.5, "swap_short": -3.2},
+    "USD/NOK": {"ticker": "USDNOK=X", "clase": "Forex", "cot": "Neutral", "query": "USD NOK dolar corona noruega", "swap_long": 1.8, "swap_short": -3.6},
+
+    # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
     "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
+
+    # Commodities & Agrícolas
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
@@ -188,6 +215,8 @@ ACTIVOS_TICKERS = {
     "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
     "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
     "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
+
+    # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
@@ -292,7 +321,6 @@ else:
 # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (GLOBAL INSTITUCIONAL)
 st.header("2. 📊 Datos Económicos Relevantes de la Semana")
 
-# Cálculo automático de Rango Semanal (Lunes a Viernes de la semana en curso)
 hoy = datetime.now()
 inicio_semana = hoy - timedelta(days=hoy.weekday())
 fin_semana = inicio_semana + timedelta(days=4)
