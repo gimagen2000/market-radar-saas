@@ -282,7 +282,6 @@ def obtener_noticias_rss(query_termino):
     except Exception:
         pass
     return noticias
-
 # --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
     "📊 Terminal de Mercado", 
