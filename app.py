@@ -40,7 +40,7 @@ def render_adsense(client_id, slot_id, height=100):
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
-# --- ESTILOS CSS PROFESIONALES + TARJETAS MACRO Y SWAP ---
+# --- ESTILOS CSS PROFESIONALES + TARJETAS MACRO, SWAP Y CISNE NEGRO ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -48,6 +48,15 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
+    
+    /* TARJETA ESPECIAL CISNE NEGRO */
+    .black-swan-card {
+        background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+        border: 1px solid #da3633;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 15px;
+    }
     
     /* TARJETAS PARA DATOS ECONÓMICOS DE LA SEMANA */
     .cal-card {
@@ -159,9 +168,8 @@ if st.session_state.user_plan == "Free":
     with st.sidebar:
         render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
 
-# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES (CON FOREX EXTENDIDO) ---
+# --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
 ACTIVOS_TICKERS = {
-    # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
@@ -169,54 +177,23 @@ ACTIVOS_TICKERS = {
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
-
-    # Forex Minors / Cruces
     "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
     "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
     "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
-    "AUD/JPY": {"ticker": "AUDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "AUD JPY australiano yen", "swap_long": 2.5, "swap_short": -4.1},
-    "NZD/JPY": {"ticker": "NZDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "NZD JPY neozelandes yen", "swap_long": 2.2, "swap_short": -3.8},
-    "CAD/JPY": {"ticker": "CADJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CAD JPY canadiense yen", "swap_long": 3.0, "swap_short": -4.9},
-    "CHF/JPY": {"ticker": "CHFJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CHF JPY franco yen", "swap_long": 1.8, "swap_short": -3.5},
-    "EUR/AUD": {"ticker": "EURAUD=X", "clase": "Forex", "cot": "Neutral", "query": "EUR AUD euro australiano", "swap_long": -4.2, "swap_short": 1.5},
-    "EUR/CAD": {"ticker": "EURCAD=X", "clase": "Forex", "cot": "Neutral", "query": "EUR CAD euro canadiense", "swap_long": -2.9, "swap_short": 0.8},
-    "GBP/AUD": {"ticker": "GBPAUD=X", "clase": "Forex", "cot": "Neutral", "query": "GBP AUD libra australiano", "swap_long": -3.8, "swap_short": 1.1},
-    "GBP/CAD": {"ticker": "GBPCAD=X", "clase": "Forex", "cot": "Neutral", "query": "GBP CAD libra canadiense", "swap_long": -2.4, "swap_short": 0.6},
-
-    # Forex Emergentes & LATAM
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
-    "USD/BRL": {"ticker": "USDBRL=X", "clase": "Forex", "cot": "Neutral", "query": "USD BRL dolar real brasileno", "swap_long": 10.5, "swap_short": -14.0},
-    "USD/ZAR": {"ticker": "USDZAR=X", "clase": "Forex", "cot": "Neutral", "query": "USD ZAR dolar rand sudafricano", "swap_long": 9.2, "swap_short": -12.8},
-    "USD/TRY": {"ticker": "USDTRY=X", "clase": "Forex", "cot": "Neutral", "query": "USD TRY dolar lira turca", "swap_long": 25.0, "swap_short": -38.0},
-    "USD/SEK": {"ticker": "USDSEK=X", "clase": "Forex", "cot": "Neutral", "query": "USD SEK dolar corona sueca", "swap_long": 1.5, "swap_short": -3.2},
-    "USD/NOK": {"ticker": "USDNOK=X", "clase": "Forex", "cot": "Neutral", "query": "USD NOK dolar corona noruega", "swap_long": 1.8, "swap_short": -3.6},
-
-    # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
     "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
-
-    # Commodities & Agrícolas
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion", "swap_long": -3.1, "swap_short": 1.0},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion", "swap_long": -2.5, "swap_short": 0.8},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion", "swap_long": -1.0, "swap_short": -0.3},
-    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado", "swap_long": -1.4, "swap_short": -0.2},
-    "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado", "swap_long": -0.8, "swap_short": -0.5},
-    "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa", "swap_long": -0.9, "swap_short": -0.4},
-    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado", "swap_long": -0.6, "swap_short": -0.3},
-    "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
-    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
-    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
-    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
-
-    # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
@@ -318,7 +295,7 @@ if not df_filtered.empty:
 else:
     st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-# MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (GLOBAL INSTITUCIONAL)
+# MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA
 st.header("2. 📊 Datos Económicos Relevantes de la Semana")
 
 hoy = datetime.now()
@@ -378,9 +355,7 @@ with col_cal1:
     zona_horaria_sel = st.selectbox("🌐 Ajuste de Hora Local", list(ZONAS_HORARIAS.keys()), index=0)
     offset_sel = ZONAS_HORARIAS[zona_horaria_sel]
 
-# Catálogo Macroeconómico de la Semana (Jerarquizado por importancia global)
 eventos_semana_relevantes = [
-    # ESTADOS UNIDOS (USD)
     {
         "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
         "Día": "Miércoles", "Hora_GMT": "14:30", 
@@ -399,38 +374,12 @@ eventos_semana_relevantes = [
     },
     {
         "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
-        "Día": "Jueves", "Hora_GMT": "13:45", 
-        "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
-        "Indicador": "PMI Flash Manufacturero / Servicios de S&P Global", 
-        "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "52.0", "Dato_Esperado": "51.8", "Dato_Publicado": "Pendiente ⏳"
-    },
-    # EUROZONA & PRINCIPALES POTENCIAS EUROPEAS (EUR)
-    {
-        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
         "Día": "Jueves", "Hora_GMT": "07:30", 
         "País": "Alemania (EUR)", "Bandera": "🇩🇪", 
         "Indicador": "PMI Manufacturero de Alemania (HCOB)", 
         "Impacto": "🔴 Alto Impacto", 
         "Dato_Anterior": "40.6", "Dato_Esperado": "40.8", "Dato_Publicado": "Pendiente ⏳"
     },
-    {
-        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
-        "Día": "Jueves", "Hora_GMT": "07:15", 
-        "País": "Francia (EUR)", "Bandera": "🇫🇷", 
-        "Indicador": "PMI Flash del Sector Servicios (HCOB)", 
-        "Impacto": "🟡 Impacto Medio", 
-        "Dato_Anterior": "49.6", "Dato_Esperado": "49.8", "Dato_Publicado": "Pendiente ⏳"
-    },
-    {
-        "Fecha": (inicio_semana + timedelta(days=4)).strftime("%Y-%m-%d"), 
-        "Día": "Viernes", "Hora_GMT": "07:00", 
-        "País": "España (EUR)", "Bandera": "🇪🇸", 
-        "Indicador": "Índice de Precios al Consumidor IPC (YoY Preliminar)", 
-        "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "1.5%", "Dato_Esperado": "1.7%", "Dato_Publicado": "Pendiente ⏳"
-    },
-    # REINO UNIDO (GBP)
     {
         "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
         "Día": "Miércoles", "Hora_GMT": "06:00", 
@@ -439,16 +388,6 @@ eventos_semana_relevantes = [
         "Impacto": "🔴 Alto Impacto", 
         "Dato_Anterior": "2.2%", "Dato_Esperado": "2.1%", "Dato_Publicado": "2.2%"
     },
-    # SUIZA (CHF)
-    {
-        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
-        "Día": "Jueves", "Hora_GMT": "06:00", 
-        "País": "Suiza (CHF)", "Bandera": "🇨🇭", 
-        "Indicador": "Balanza Comercial y Exportaciones Suizas", 
-        "Impacto": "🟡 Impacto Medio", 
-        "Dato_Anterior": "4.21B", "Dato_Esperado": "4.15B", "Dato_Publicado": "Pendiente ⏳"
-    },
-    # CHINA (CNY)
     {
         "Fecha": (inicio_semana + timedelta(days=0)).strftime("%Y-%m-%d"), 
         "Día": "Lunes", "Hora_GMT": "01:15", 
@@ -456,15 +395,6 @@ eventos_semana_relevantes = [
         "Indicador": "Tasa Preferencial de Préstamos del PBoC (1 Año)", 
         "Impacto": "🔴 Alto Impacto", 
         "Dato_Anterior": "3.35%", "Dato_Esperado": "3.10%", "Dato_Publicado": "3.10%"
-    },
-    # JAPÓN (JPY)
-    {
-        "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
-        "Día": "Jueves", "Hora_GMT": "23:30", 
-        "País": "Japón (JPY)", "Bandera": "🇯🇵", 
-        "Indicador": "IPC Subyacente de Tokio (YoY)", 
-        "Impacto": "🔴 Alto Impacto", 
-        "Dato_Anterior": "2.0%", "Dato_Esperado": "1.7%", "Dato_Publicado": "Pendiente ⏳"
     }
 ]
 
@@ -498,8 +428,9 @@ with col_cal2:
     else:
         st.info("No hay datos macroeconómicos filtrados para los criterios seleccionados.")
 
-# MÓDULO 3: MICHAEL VIRTUAL & NOTICIAS
-st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa & Noticias en Tiempo Real")
+# MÓDULO 3: MICHAEL VIRTUAL — TESIS CUANTITATIVA, NOTICIAS & CISNE NEGRO
+st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
+
 if not df_market_full.empty:
     activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
     row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
@@ -547,6 +478,38 @@ if not df_market_full.empty:
                 """, unsafe_allow_html=True)
         else:
             st.info("No hay noticias recientes indexadas.")
+
+    # --- NUEVA SECCIÓN DEDICADA: RADAR DE CISNE NEGRO POR MICHAEL VIRTUAL ---
+    st.markdown("---")
+    st.markdown("### 🦅 Radar de Cisne Negro (*Black Swan Vulnerability Radar*) — Michael Virtual")
+    st.markdown("""
+    <div class="disclaimer-box" style="border-left-color: #da3633;">
+    <b>INVESTIGACIÓN DE EVENTOS EXTREMOS (TAIL RISK):</b> Michael Virtual evalúa la fragilidad estructural, la liquidez y las anomalías de sobreextensión para detectar posibles catalizadores impredecibles de alto impacto en el activo seleccionado.
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro"):
+        # Cálculo de métricas de fragilidad técnica
+        percentil = row_sel['Percentil 1Y (%)']
+        nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
+        color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
+
+        st.markdown(f"""
+        <div class="black-swan-card">
+            <h4>🚨 Informe de Stress-Test y Colapso de Riesgo: {row_sel['Activo']}</h4>
+            <p><b>Índice de Fragilidad Estructural:</b> <span style="color: {color_vulnerabilidad}; font-weight: bold;">{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span></p>
+            <hr style="border: 0.5px solid #30363d;">
+            <h5>🔬 Posibles Catalizadores de Cisne Negro Investigados:</h5>
+            <ul>
+                <li><b>1. Shock Geopolítico y Bloqueo de Cadenas de Suministro:</b> Alteraciones repentinas en estrechos marítimos o sanciones comerciales unilaterales que provoquen un estrangulamiento de oferta.</li>
+                <li><b>2. Contagio de Liquidez e Insolvencia Interbancaria:</b> Subidas de tasas acumuladas que fracturen la estructura de deuda corporativa, obligando a ventas masivas para liquidar margen.</li>
+                <li><b>3. Descalce de Swaps y Rollover Extremadamente Negativo:</b> Un aumento abrupto en los spreads del mercado interbancario que vuelva inviable el sostenimiento de posiciones abiertas.</li>
+                <li><b>4. Intervención Cambiaria / Bancos Centrales:</b> Inyecciones o ventas masivas no anunciadas de reservas internacionales por parte de bancos centrales para frenar devaluaciones.</li>
+            </ul>
+            <hr style="border: 0.5px solid #30363d;">
+            <p><b>🛡️ Recomendación de Cobertura (Michael Virtual):</b> Mantenimiento estricto de margen sin apalancamiento excesivo (>1:10) y diversificación en activos de baja correlación.</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP CON APALANCAMIENTO Y LOTES
 st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
