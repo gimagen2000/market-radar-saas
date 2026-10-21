@@ -281,8 +281,7 @@ def obtener_noticias_rss(query_termino):
                     })
     except Exception:
         pass
-    return noticias
-# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    return noticias# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos & Propósito", 
@@ -458,7 +457,7 @@ with tab_terminal:
         else:
             st.info("No hay datos macroeconómicos filtrados para los criterios seleccionados.")
 
-    # MÓDULO 3: MICHAEL VIRTUAL — TESIS, NOTICIAS & CISNE NEGRO MULTI-ANALISTA
+    # MÓDULO 3: MICHAEL VIRTUAL — TESIS, NOTICIAS & CISNE NEGRO MULTI-ANALISTA (SIN NOMBRES PROPIOS)
     st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
 
     if not df_market_full.empty:
@@ -509,16 +508,16 @@ with tab_terminal:
             else:
                 st.info("No hay noticias recientes indexadas.")
 
-        # SECCIÓN INTEGRADA: RADAR CISNE NEGRO MULTI-ANALISTA
+        # SECCIÓN INTEGRADA: RADAR CISNE NEGRO (ANONIMIZADO DE NOMBRES PROPIOS)
         st.markdown("---")
         st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
         st.markdown("""
         <div class="disclaimer-box" style="border-left-color: #da3633;">
-        <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual integra el marco conceptual de <b>José Vizner</b>, <b>Mar Vidal</b>, <b>José Luis Cava</b> y <b>Alberto Iturralde</b> para evaluar vulnerabilidades geopolíticas, flujos de liquidez, patrones institucionales y trampas de mercado sobre el activo seleccionado.
+        <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual integra un modelo analítico avanzado que evalúa vulnerabilidades geopolíticas, flujos de liquidez soberana, patrones institucionales y trampas de mercado sobre el activo seleccionado.
         </div>
         """, unsafe_allow_html=True)
 
-        if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro (Visión Cava / Vizner / Iturralde / Vidal)"):
+        if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro"):
             percentil = row_sel['Percentil 1Y (%)']
             nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
             color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
@@ -529,21 +528,21 @@ with tab_terminal:
                 <p><b>Índice de Fragilidad Cuantitativa:</b> <span style="color: {color_vulnerabilidad}; font-weight: bold;">{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span></p>
                 <hr style="border: 0.5px solid #30363d;">
                 
-                <h5>🏛️ 1. Macro-Geopolítica y Liquidez Soberana (Enfoque José Vizner & Mar Vidal):</h5>
+                <h5>🏛️ 1. Macro-Geopolítica y Liquidez Soberana:</h5>
                 <ul>
-                    <li><b>Guerra de Divisas y Liquidez Interbancaria:</b> Riesgo de restricción de liquidez por parte de la Fed o BCE que fuerce una liquidación en cadena de colaterales.</li>
+                    <li><b>Guerra de Divisas y Liquidez Interbancaria:</b> Riesgo de restricción de liquidez por parte de bancos centrales que fuerce una liquidación en cadena de colaterales.</li>
                     <li><b>Escalada Geopolítica / Shocks de Suministro:</b> Disrupción repentina en vías de transporte marítimo o suministros energéticos que descontrole las previsiones de inflación y fuerce alzas de tasas no descontadas.</li>
                 </ul>
 
-                <h5>📈 2. Volatilidad, Estructura de Liquidez y Flujos (Enfoque José Luis Cava):</h5>
+                <h5>📈 2. Volatilidad, Estructura de Liquidez y Flujos Institucionales:</h5>
                 <ul>
                     <li><b>Atrapamiento de Volatilidad (VIX Spike) & Gamma Squeeze:</b> Ruptura de zonas clave de soporte/resistencia donde la acumulación de opciones fuerce a los creadores de mercado (*Market Makers*) a cubrirse vendiendo masivamente en contado.</li>
                     <li><b>Cierre Repentino de Ventanas de Repos:</b> Riesgo de descalce de colaterales en los balances de los grandes bancos de inversión.</li>
                 </ul>
 
-                <h5>🎯 3. Psicología Institucional y Trampas para el Minorista (Enfoque Alberto Iturralde):</h5>
+                <h5>🎯 3. Psicología Institucional y Trampas de Mercado:</h5>
                 <ul>
-                    <li><b>Barriendo de Liquidez en Extremos Anuales:</b> Formación de falsas rupturas (*fakes*) cerca del suelo/techo anual ({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']}) diseñadas para absorber las órdenes del inversor minorista antes de un giro violento del gran capital.</li>
+                    <li><b>Barridos de Liquidez en Extremos Anuales:</b> Formación de falsas rupturas (*fakes*) cerca del suelo/techo anual ({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']}) diseñadas para absorber las órdenes del inversor minorista antes de un giro violento del gran capital.</li>
                     <li><b>Distribución Silenciosa:</b> Discursos optimistas en medios tradicionales mientras el dinero inteligente (*Smart Money*) rota o reduce exposición.</li>
                 </ul>
 
@@ -619,7 +618,7 @@ with tab_terminal:
 
 
 # ==========================================
-# PESTAÑA 2: QUIÉNES SOMOS Y PROPÓSITO
+# PESTAÑA 2: QUIÉNES SOMOS Y PROPÓSITO (ANONIMIZADO)
 # ==========================================
 with tab_nosotros:
     st.title("🏛️ Quiénes Somos & Propósito Fundamental")
@@ -652,10 +651,10 @@ with tab_nosotros:
         <h4>🤖 El Origen de Michael Virtual</h4>
         <p><b>Michael Virtual</b> es el motor cuantitativo de inteligencia analítica integrado en la terminal. Sintetiza los cuatro pilares fundamentales del análisis financiero contemporáneo:</p>
         <ul>
-            <li><b>Geopolítica & Liquidez Soberana:</b> Inspirado en el rigor analítico de <i>José Vizner</i>.</li>
-            <li><b>Estructura Monetaria & Ciclos Macro:</b> Basado en los principios de <i>Mar Vidal</i>.</li>
-            <li><b>Flujos de Mercado, Volatilidad & Opciones:</b> Siguiendo los modelos de <i>José Luis Cava</i>.</li>
-            <li><b>Psicología Institucional y Trampas Minoristas:</b> Adoptando la visión crítica de <i>Alberto Iturralde</i>.</li>
+            <li><b>Geopolítica & Liquidez Soberana:</b> Análisis riguroso del entorno geopolítico y flujos de liquidez global.</li>
+            <li><b>Estructura Monetaria & Ciclos Macro:</b> Modelado de políticas monetarias de bancos centrales y ciclos económicos.</li>
+            <li><b>Flujos de Mercado, Volatilidad & Opciones:</b> Lectura de la estructura de liquidez y mercado de derivados.</li>
+            <li><b>Psicología Institucional y Trampas Minoristas:</b> Identificación de trampas de liquidez y comportamiento del gran capital.</li>
         </ul>
         </div>
         """, unsafe_allow_html=True)
