@@ -199,7 +199,7 @@ ACTIVOS_TICKERS = {
     "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
 
-    # Commodities Energéticos, Metales y Agrícolas (¡Gas Natural Incluido!)
+    # Commodities Energéticos, Metales y Agrícolas
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
@@ -312,6 +312,7 @@ with tab_terminal:
             color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
         return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
+    # MÓDULO 1: EXPLORADOR DE CARTERA GLOBAL
     st.header("1. Explorador de Cartera Global y Percentiles Anuales")
     col_f1, col_f2 = st.columns(2)
     with col_f1:
