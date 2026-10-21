@@ -40,7 +40,7 @@ def render_adsense(client_id, slot_id, height=100):
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
-# --- ESTILOS CSS PROFESIONALES + TARJETAS MACRO, SWAP Y CISNE NEGRO ---
+# --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -49,7 +49,7 @@ st.markdown("""
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
     
-    /* TARJETA ESPECIAL CISNE NEGRO */
+    /* TARJETA ESPECIAL CISNE NEGRO MULTI-ANALISTA */
     .black-swan-card {
         background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
         border: 1px solid #da3633;
@@ -170,30 +170,30 @@ if st.session_state.user_plan == "Free":
 
 # --- CARTERA EXPANDIDA DE ACTIVOS GLOBALES ---
 ACTIVOS_TICKERS = {
+    # Forex
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
     "AUD/USD": {"ticker": "AUDUSD=X", "clase": "Forex", "cot": "Neto Comprador (+5k)", "query": "AUD USD australian dollar", "swap_long": -1.5, "swap_short": -0.4},
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
-    "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
-    "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
-    "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
-    "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
-    "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
+    
+    # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
-    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
+    
+    # Commodities
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
-    "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion", "swap_long": -3.1, "swap_short": 1.0},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion", "swap_long": -2.5, "swap_short": 0.8},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion", "swap_long": -1.0, "swap_short": -0.3},
+    
+    # Crypto
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
@@ -337,14 +337,10 @@ with col_cal1:
             "Estados Unidos (USD)", 
             "Eurozona (EUR)", 
             "Alemania (EUR)", 
-            "Francia (EUR)", 
-            "España (EUR)", 
             "Reino Unido (GBP)", 
             "Suiza (CHF)", 
             "China (CNY)", 
-            "Japón (JPY)", 
-            "Canadá (CAD)", 
-            "Australia (AUD)"
+            "Japón (JPY)"
         ]
     )
     impacto_sel = st.multiselect(
@@ -428,7 +424,7 @@ with col_cal2:
     else:
         st.info("No hay datos macroeconómicos filtrados para los criterios seleccionados.")
 
-# MÓDULO 3: MICHAEL VIRTUAL — TESIS CUANTITATIVA, NOTICIAS & CISNE NEGRO
+# MÓDULO 3: MICHAEL VIRTUAL — TESIS, NOTICIAS & CISNE NEGRO MULTI-ANALISTA
 st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
 
 if not df_market_full.empty:
@@ -479,35 +475,46 @@ if not df_market_full.empty:
         else:
             st.info("No hay noticias recientes indexadas.")
 
-    # --- NUEVA SECCIÓN DEDICADA: RADAR DE CISNE NEGRO POR MICHAEL VIRTUAL ---
+    # --- SECCIÓN INTEGRADA: RADAR CISNE NEGRO MULTI-ANALISTA ---
     st.markdown("---")
-    st.markdown("### 🦅 Radar de Cisne Negro (*Black Swan Vulnerability Radar*) — Michael Virtual")
+    st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
     st.markdown("""
     <div class="disclaimer-box" style="border-left-color: #da3633;">
-    <b>INVESTIGACIÓN DE EVENTOS EXTREMOS (TAIL RISK):</b> Michael Virtual evalúa la fragilidad estructural, la liquidez y las anomalías de sobreextensión para detectar posibles catalizadores impredecibles de alto impacto en el activo seleccionado.
+    <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual integra el marco conceptual de <b>José Vizner</b>, <b>Mar Vidal</b>, <b>José Luis Cava</b> y <b>Alberto Iturralde</b> para evaluar vulnerabilidades geopolíticas, flujos de liquidez, patrones institucionales y trampas de mercado sobre el activo seleccionado.
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro"):
-        # Cálculo de métricas de fragilidad técnica
+    if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro (Visión Cava / Vizner / Iturralde / Vidal)"):
         percentil = row_sel['Percentil 1Y (%)']
         nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
         color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
 
         st.markdown(f"""
         <div class="black-swan-card">
-            <h4>🚨 Informe de Stress-Test y Colapso de Riesgo: {row_sel['Activo']}</h4>
-            <p><b>Índice de Fragilidad Estructural:</b> <span style="color: {color_vulnerabilidad}; font-weight: bold;">{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span></p>
+            <h4>🚨 Informe de Vulnerabilidad y Estrés Extremo: {row_sel['Activo']}</h4>
+            <p><b>Índice de Fragilidad Cuantitativa:</b> <span style="color: {color_vulnerabilidad}; font-weight: bold;">{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span></p>
             <hr style="border: 0.5px solid #30363d;">
-            <h5>🔬 Posibles Catalizadores de Cisne Negro Investigados:</h5>
+            
+            <h5>🏛️ 1. Macro-Geopolítica y Liquidez Soberana (Enfoque José Vizner & Mar Vidal):</h5>
             <ul>
-                <li><b>1. Shock Geopolítico y Bloqueo de Cadenas de Suministro:</b> Alteraciones repentinas en estrechos marítimos o sanciones comerciales unilaterales que provoquen un estrangulamiento de oferta.</li>
-                <li><b>2. Contagio de Liquidez e Insolvencia Interbancaria:</b> Subidas de tasas acumuladas que fracturen la estructura de deuda corporativa, obligando a ventas masivas para liquidar margen.</li>
-                <li><b>3. Descalce de Swaps y Rollover Extremadamente Negativo:</b> Un aumento abrupto en los spreads del mercado interbancario que vuelva inviable el sostenimiento de posiciones abiertas.</li>
-                <li><b>4. Intervención Cambiaria / Bancos Centrales:</b> Inyecciones o ventas masivas no anunciadas de reservas internacionales por parte de bancos centrales para frenar devaluaciones.</li>
+                <li><b>Guerra de Divisas y Liquidez Interbancaria:</b> Riesgo de restricción de liquidez por parte de la Fed o BCE que fuerce una liquidación en cadena de colaterales.</li>
+                <li><b>Escalada Geopolítica / Shocks de Suministro:</b> Disrupción repentina en vías de transporte marítimo o suministros energéticos que descontrole las previsiones de inflación y fuerce alzas de tasas no descontadas.</li>
             </ul>
+
+            <h5>📈 2. Volatilidad, Estructura de Liquidez y Flujos (Enfoque José Luis Cava):</h5>
+            <ul>
+                <li><b>Atrapamiento de Volatilidad (VIX Spike) & Gamma Squeeze:</b> Ruptura de zonas clave de soporte/resistencia donde la acumulación de opciones fuerce a los creadores de mercado (*Market Makers*) a cubrirse vendiendo masivamente en contado.</li>
+                <li><b>Cierre Repentino de Ventanas de Repos:</b> Riesgo de descalce de colaterales en los balances de los grandes bancos de inversión.</li>
+            </ul>
+
+            <h5>🎯 3. Psicología Institucional y Trampas para el Minorista (Enfoque Alberto Iturralde):</h5>
+            <ul>
+                <li><b>Barriendo de Liquidez en Extremos Anuales:</b> Formación de falsas rupturas (*fakes*) cerca del suelo/techo anual ({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']}) diseñadas para absorber las órdenes del inversor minorista antes de un giro violento del gran capital.</li>
+                <li><b>Distribución Silenciosa:</b> Discursos optimistas en medios tradicionales mientras el dinero inteligente (*Smart Money*) rota o reduce exposición.</li>
+            </ul>
+
             <hr style="border: 0.5px solid #30363d;">
-            <p><b>🛡️ Recomendación de Cobertura (Michael Virtual):</b> Mantenimiento estricto de margen sin apalancamiento excesivo (>1:10) y diversificación en activos de baja correlación.</p>
+            <p><b>🛡️ Dictamen de Protección (Michael Virtual):</b> "No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo." Operar estrictamente en asimetría Long-Only cuando el activo esté cerca de su suelo anual, controlando el apalancamiento máximo a 1:10 y previendo costos de Swap Overnight.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -525,9 +532,9 @@ with c2:
     apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20, 30, 50, 100], index=2)
     lotes_manuales = st.number_input("Tamaño de Posición Personalizado (Lotes)", value=1.0, min_value=0.01, max_value=100.0, step=0.1)
     
-    # Cálculos Cuantitativos Integrados
+    # Cálculos Cuantitativos
     expo_teorica = cap * apalanque
-    nocional_lotes = lotes_manuales * 100000  # Valor nocional estándar de Forex/Contrato
+    nocional_lotes = lotes_manuales * 100000
     riesgo = cap * (piso / 100.0)
     lote_sugerido = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
     
@@ -535,7 +542,6 @@ with c2:
     swap_short = row_sel['Swap Short ($/lote)']
     swap_rate_unit = swap_long if "Long" in direccion_pos else swap_short
     
-    # Cálculo directo con Lotes e Impacto de Apalancamiento
     diferencial_swap_lote = swap_rate_unit * lotes_manuales
     costo_swap_total = diferencial_swap_lote * dias_operados
     impacto_swap_pct = (costo_swap_total / cap) * 100
