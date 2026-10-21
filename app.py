@@ -359,4 +359,369 @@ with tab_terminal:
             nueva_hh = (hh + offset_horas) % 24
             return f"{nueva_hh:02d}:{mm:02d}"
         except Exception:
-            return hora_gmt_
+            return hora_gmt_str
+
+    col_cal1, col_cal2 = st.columns([1, 2.2])
+
+    with col_cal1:
+        pais_sel = st.selectbox(
+            "Filtrar por Economía / Región", 
+            [
+                "Todas las Economías Clave", 
+                "Estados Unidos (USD)", 
+                "Eurozona (EUR)", 
+                "Alemania (EUR)", 
+                "Reino Unido (GBP)", 
+                "Suiza (CHF)", 
+                "China (CNY)", 
+                "Japón (JPY)"
+            ]
+        )
+        impacto_sel = st.multiselect(
+            "Relevancia de Impacto", 
+            ["🔴 Alto Impacto", "🟡 Impacto Medio", "🟢 Bajo Impacto"], 
+            default=["🔴 Alto Impacto", "🟡 Impacto Medio"]
+        )
+        zona_horaria_sel = st.selectbox("🌐 Ajuste de Hora Local", list(ZONAS_HORARIAS.keys()), index=0)
+        offset_sel = ZONAS_HORARIAS[zona_horaria_sel]
+
+    eventos_semana_relevantes = [
+        {
+            "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
+            "Día": "Miércoles", "Hora_GMT": "14:30", 
+            "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
+            "Indicador": "Inventarios de Petróleo Crudo de la EIA", 
+            "Impacto": "🔴 Alto Impacto", 
+            "Dato_Anterior": "2.10M", "Dato_Esperado": "1.80M", "Dato_Publicado": "Pendiente ⏳"
+        },
+        {
+            "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+            "Día": "Jueves", "Hora_GMT": "12:30", 
+            "País": "Estados Unidos (USD)", "Bandera": "🇺🇸", 
+            "Indicador": "Nuevas Peticiones de Subsidio por Desempleo", 
+            "Impacto": "🔴 Alto Impacto", 
+            "Dato_Anterior": "241K", "Dato_Esperado": "243K", "Dato_Publicado": "Pendiente ⏳"
+        },
+        {
+            "Fecha": (inicio_semana + timedelta(days=3)).strftime("%Y-%m-%d"), 
+            "Día": "Jueves", "Hora_GMT": "07:30", 
+            "País": "Alemania (EUR)", "Bandera": "🇩🇪", 
+            "Indicador": "PMI Manufacturero de Alemania (HCOB)", 
+            "Impacto": "🔴 Alto Impacto", 
+            "Dato_Anterior": "40.6", "Dato_Esperado": "40.8", "Dato_Publicado": "Pendiente ⏳"
+        },
+        {
+            "Fecha": (inicio_semana + timedelta(days=2)).strftime("%Y-%m-%d"), 
+            "Día": "Miércoles", "Hora_GMT": "06:00", 
+            "País": "Reino Unido (GBP)", "Bandera": "🇬🇧", 
+            "Indicador": "Índice de Precios al Consumidor IPC (YoY)", 
+            "Impacto": "🔴 Alto Impacto", 
+            "Dato_Anterior": "2.2%", "Dato_Esperado": "2.1%", "Dato_Publicado": "2.2%"
+        },
+        {
+            "Fecha": (inicio_semana + timedelta(days=0)).strftime("%Y-%m-%d"), 
+            "Día": "Lunes", "Hora_GMT": "01:15", 
+            "País": "China (CNY)", "Bandera": "🇨🇳", 
+            "Indicador": "Tasa Preferencial de Préstamos del PBoC (1 Año)", 
+            "Impacto": "🔴 Alto Impacto", 
+            "Dato_Anterior": "3.35%", "Dato_Esperado": "3.10%", "Dato_Publicado": "3.10%"
+        }
+    ]
+
+    eventos_filtrados = [
+        e for e in eventos_semana_relevantes 
+        if (pais_sel == "Todas las Economías Clave" or e["País"] == pais_sel)
+        and (not impacto_sel or e["Impacto"] in impacto_sel)
+    ]
+
+    with col_cal2:
+        if eventos_filtrados:
+            for ev in eventos_filtrados:
+                hora_ajustada = ajustar_hora(ev["Hora_GMT"], offset_sel)
+                card_class = "cal-card-high" if "🔴" in ev["Impacto"] else ("cal-card-med" if "🟡" in ev["Impacto"] else "cal-card-low")
+                badge_class = "badge-high" if "🔴" in ev["Impacto"] else ("badge-med" if "🟡" in ev["Impacto"] else "badge-low")
+                
+                st.markdown(f"""
+                <div class="cal-card {card_class}">
+                    <div class="cal-header">
+                        <span>🗓️ <b>{ev['Día']} {ev['Fecha']}</b> | ⏰ <b>{hora_ajustada} hrs</b></span>
+                        <span class="cal-badge {badge_class}">{ev['Impacto']}</span>
+                    </div>
+                    <div class="cal-title">{ev['Bandera']} {ev['País']} — {ev['Indicador']}</div>
+                    <div class="cal-metrics">
+                        <span><b>1. Dato Anterior (Previo):</b> <code>{ev['Dato_Anterior']}</code></span>
+                        <span><b>2. Dato Esperado (Previsión):</b> <code>{ev['Dato_Esperado']}</code></span>
+                        <span><b>3. Dato Publicado (Actual):</b> <code style="color: #58a6ff; font-weight: bold;">{ev['Dato_Publicado']}</code></span>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("No hay datos macroeconómicos filtrados para los criterios seleccionados.")
+
+    # MÓDULO 3: MICHAEL VIRTUAL — TESIS, NOTICIAS & CISNE NEGRO MULTI-ANALISTA
+    st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
+
+    if not df_market_full.empty:
+        activo_sel = st.selectbox("Seleccionar Activo Global", df_market_full["Activo"].tolist())
+        row_sel = df_market_full[df_market_full["Activo"] == activo_sel].iloc[0]
+        query_busqueda = ACTIVOS_TICKERS[activo_sel]["query"]
+
+        col_t1, col_t2 = st.columns([1.2, 1])
+
+        with col_t1:
+            if st.button("✨ Generar Tesis Cuantitativa con Michael Virtual"):
+                if st.session_state.user_plan == "Free":
+                    st.markdown(f"""
+                    <div class="ad-container">
+                        <div class="ad-title">⚡ Patrocinado por Libertex</div>
+                        <p style="font-size: 13px; color: #c9d1d9; margin: 5px 0;"><b>¿Deseas operar este activo con ejecución directa?</b></p>
+                        <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Operar esta Tesis en Libertex 🚀</a>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=120)
+
+                st.markdown(f"""
+                <div class="quant-card">
+                <h4>📋 Informe Técnico: {row_sel['Activo']} ({row_sel['Clase']})</h4>
+                <ul>
+                    <li><b>Cotización Actual:</b> {row_sel['Precio Actual']}</li>
+                    <li><b>Rango 52 Semanas:</b> Mín: {row_sel['Mín 52 Sem']} | Máx: {row_sel['Máx 52 Sem']}</li>
+                    <li><b>Percentil 1Y:</b> {row_sel['Percentil 1Y (%)']}%</li>
+                    <li><b>Flujo COT:</b> {row_sel['Flujo COT (Institucional)']}</li>
+                    <li><b>Swap Diario Long:</b> <span style="color: {'#3fb950' if row_sel['Swap Long ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Long ($/lote)']} USD/lote</span></li>
+                    <li><b>Swap Diario Short:</b> <span style="color: {'#3fb950' if row_sel['Swap Short ($/lote)'] > 0 else '#f85149'};">{row_sel['Swap Short ($/lote)']} USD/lote</span></li>
+                </ul>
+                <p><b>Evaluación Estadísticamente Unidireccional:</b> El activo opera cerca de su suelo anual de {row_sel['Mín 52 Sem']}, lo que presenta asimetría favorable para modelos de acumulación por tramos en estrategias Long-Only.</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with col_t2:
+            st.markdown("#### 📰 Noticias del Mercado")
+            noticias = obtener_noticias_rss(query_busqueda)
+            if noticias:
+                for n in noticias:
+                    st.markdown(f"""
+                    <div class="news-box">
+                    <b>{n['publisher']}:</b> <a href="{n['link']}" target="_blank" style="color: #58a6ff; font-weight: bold; text-decoration: none;">{n['title']} 🔗</a>
+                    </div>
+                    """, unsafe_allow_html=True)
+            else:
+                st.info("No hay noticias recientes indexadas.")
+
+        # SECCIÓN INTEGRADA: RADAR CISNE NEGRO MULTI-ANALISTA
+        st.markdown("---")
+        st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
+        st.markdown("""
+        <div class="disclaimer-box" style="border-left-color: #da3633;">
+        <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual integra el marco conceptual de <b>José Vizner</b>, <b>Mar Vidal</b>, <b>José Luis Cava</b> y <b>Alberto Iturralde</b> para evaluar vulnerabilidades geopolíticas, flujos de liquidez, patrones institucionales y trampas de mercado sobre el activo seleccionado.
+        </div>
+        """, unsafe_allow_html=True)
+
+        if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro (Visión Cava / Vizner / Iturralde / Vidal)"):
+            percentil = row_sel['Percentil 1Y (%)']
+            nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
+            color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
+
+            st.markdown(f"""
+            <div class="black-swan-card">
+                <h4>🚨 Informe de Vulnerabilidad y Estrés Extremo: {row_sel['Activo']}</h4>
+                <p><b>Índice de Fragilidad Cuantitativa:</b> <span style="color: {color_vulnerabilidad}; font-weight: bold;">{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span></p>
+                <hr style="border: 0.5px solid #30363d;">
+                
+                <h5>🏛️ 1. Macro-Geopolítica y Liquidez Soberana (Enfoque José Vizner & Mar Vidal):</h5>
+                <ul>
+                    <li><b>Guerra de Divisas y Liquidez Interbancaria:</b> Riesgo de restricción de liquidez por parte de la Fed o BCE que fuerce una liquidación en cadena de colaterales.</li>
+                    <li><b>Escalada Geopolítica / Shocks de Suministro:</b> Disrupción repentina en vías de transporte marítimo o suministros energéticos que descontrole las previsiones de inflación y fuerce alzas de tasas no descontadas.</li>
+                </ul>
+
+                <h5>📈 2. Volatilidad, Estructura de Liquidez y Flujos (Enfoque José Luis Cava):</h5>
+                <ul>
+                    <li><b>Atrapamiento de Volatilidad (VIX Spike) & Gamma Squeeze:</b> Ruptura de zonas clave de soporte/resistencia donde la acumulación de opciones fuerce a los creadores de mercado (*Market Makers*) a cubrirse vendiendo masivamente en contado.</li>
+                    <li><b>Cierre Repentino de Ventanas de Repos:</b> Riesgo de descalce de colaterales en los balances de los grandes bancos de inversión.</li>
+                </ul>
+
+                <h5>🎯 3. Psicología Institucional y Trampas para el Minorista (Enfoque Alberto Iturralde):</h5>
+                <ul>
+                    <li><b>Barriendo de Liquidez en Extremos Anuales:</b> Formación de falsas rupturas (*fakes*) cerca del suelo/techo anual ({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']}) diseñadas para absorber las órdenes del inversor minorista antes de un giro violento del gran capital.</li>
+                    <li><b>Distribución Silenciosa:</b> Discursos optimistas en medios tradicionales mientras el dinero inteligente (*Smart Money*) rota o reduce exposición.</li>
+                </ul>
+
+                <hr style="border: 0.5px solid #30363d;">
+                <p><b>🛡️ Dictamen de Protección (Michael Virtual):</b> "No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo." Operar estrictamente en asimetría Long-Only cuando el activo esté cerca de su suelo anual, controlando el apalancamiento máximo a 1:10 y previendo costos de Swap Overnight.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP
+    st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
+    c1, c2 = st.columns(2)
+    with c1:
+        cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
+        piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
+        pips_piso = st.number_input("Pips / Puntos al Piso Anual", value=250, step=10)
+        dias_operados = st.number_input("Días Estimados de Posición (Overnight)", value=5, min_value=1, step=1)
+        direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
+
+    with c2:
+        apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20, 30, 50, 100], index=2)
+        lotes_manuales = st.number_input("Tamaño de Posición Personalizado (Lotes)", value=1.0, min_value=0.01, max_value=100.0, step=0.1)
+        
+        expo_teorica = cap * apalanque
+        nocional_lotes = lotes_manuales * 100000
+        riesgo = cap * (piso / 100.0)
+        lote_sugerido = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
+        
+        swap_long = row_sel['Swap Long ($/lote)']
+        swap_short = row_sel['Swap Short ($/lote)']
+        swap_rate_unit = swap_long if "Long" in direccion_pos else swap_short
+        
+        diferencial_swap_lote = swap_rate_unit * lotes_manuales
+        costo_swap_total = diferencial_swap_lote * dias_operados
+        impacto_swap_pct = (costo_swap_total / cap) * 100
+
+    st.markdown(f"""
+    <div class="quant-card">
+        <h4>📊 Métricas de Control de Riesgo, Lotaje y Apalancamiento</h4>
+        <p><b>Capital Cuenta:</b> ${cap:,.2f} USD | <b>Apalancamiento Seleccionado:</b> 1:{apalanque}</p>
+        <p><b>Exposición Teórica con Apalancamiento:</b> ${expo_teorica:,.2f} USD</p>
+        <p><b>Volumen Real Operado ({lotes_manuales} Lote/s):</b> ${nocional_lotes:,.2f} USD Nocionales</p>
+        <p><b>Dimensionamiento Sugerido por Riesgo al Piso ({piso}%):</b> <code>{lote_sugerido:.2f} Lotes</code></p>
+        <hr style="border: 0.5px solid #30363d;">
+        <p><b>Diferencial Swap Neto Diario ({lotes_manuales} lote/s de {activo_sel}):</b> <code style="color: {'#3fb950' if diferencial_swap_lote >= 0 else '#f85149'};">${diferencial_swap_lote:,.2f} USD/día</code></p>
+        <p><b>Costo / Crédito Swap Total ({dias_operados} días overnight):</b> 
+           <code style="font-size: 16px; color: {'#3fb950' if costo_swap_total >= 0 else '#f85149'};">${costo_swap_total:,.2f} USD ({impacto_swap_pct:+.2f}% sobre capital)</code>
+        </p>
+        <p style="font-size: 11px; color: #8b949e;">⚠️ <i>Nota: Los días miércoles se aplica Triple Swap (3 noches) por el rollover del fin de semana.</i></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # MÓDULO 5: CANALES Y MEDIOS DE REFERENCIA
+    st.header("5. 📺 Canales y Fuentes de Referencia Macroeconómica")
+    col_yt1, col_yt2 = st.columns(2)
+
+    with col_yt1:
+        st.markdown("""
+        <div class="quant-card" style="text-align: center; padding: 15px;">
+            <h4>🔴 Negocios TV</h4>
+            <p style="font-size: 13px; color: #8b949e;">Análisis geopolítico, macroeconomía, mercados globales y actualidad financiera en tiempo real.</p>
+            <a href="https://www.youtube.com/@negociostv" target="_blank" class="yt-button">Ver Canal Oficial 🚀</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_yt2:
+        st.markdown(f"""
+        <div class="quant-card" style="text-align: center; padding: 15px;">
+            <h4>📊 Recursos y Datos Globales</h4>
+            <p style="font-size: 13px; color: #8b949e;">Plataformas de gráficos avanzados, informes institucionales y seguimiento de flujos de capital.</p>
+            <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ==========================================
+# PESTAÑA 2: QUIÉNES SOMOS Y PROPÓSITO
+# ==========================================
+with tab_nosotros:
+    st.title("🏛️ Quiénes Somos & Propósito Fundamental")
+    
+    st.markdown("""
+    <div class="quant-card">
+    <h3>🌐 La Filosofía detrás de Market Radar Quant Terminal</h3>
+    <p><b>Market Radar Quant Terminal</b> nace con la misión de democratizar herramientas de análisis cuantitativo, procesamiento de percentiles históricos y simulación de riesgo de nivel institucional para el inversor individual y profesional.</p>
+    <p>En un entorno financiero saturado de ruido mediático y sesgos emocionales, nuestra plataforma proporciona una <b>brújula puramente matemática, objetiva y basada en datos históricos reales</b>.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col_p1, col_p2 = st.columns(2)
+    
+    with col_p1:
+        st.markdown("""
+        <div class="quant-card">
+        <h4>🎯 Propósito y Pilares Técnicos</h4>
+        <ul>
+            <li><b>Asimetría Estadística (Percentiles Anuales):</b> Identificar activos globales operando cerca de sus suelos históricos (Percentil ≤ 20%) para maximizar el margen de seguridad.</li>
+            <li><b>Filosofía Unidireccional (Long-Only):</b> Priorizar la acumulación estratégica en activos de valor fundamental en lugar de la especulación de alto riesgo en ambas direcciones.</li>
+            <li><b>Control de Costos Ocultos (Overnight Swaps):</b> Calcular el impacto exacto del rollover diario para evitar que las tasas de interés devoren la rentabilidad de las posiciones abiertas a mediano plazo.</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_p2:
+        st.markdown("""
+        <div class="quant-card">
+        <h4>🤖 El Origen de Michael Virtual</h4>
+        <p><b>Michael Virtual</b> es el motor cuantitativo de inteligencia analítica integrado en la terminal. Sintetiza los cuatro pilares fundamentales del análisis financiero contemporáneo:</p>
+        <ul>
+            <li><b>Geopolítica & Liquidez Soberana:</b> Inspirado en el rigor analítico de <i>José Vizner</i>.</li>
+            <li><b>Estructura Monetaria & Ciclos Macro:</b> Basado en los principios de <i>Mar Vidal</i>.</li>
+            <li><b>Flujos de Mercado, Volatilidad & Opciones:</b> Siguiendo los modelos de <i>José Luis Cava</i>.</li>
+            <li><b>Psicología Institucional y Trampas Minoristas:</b> Adoptando la visión crítica de <i>Alberto Iturralde</i>.</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ==========================================
+# PESTAÑA 3: GUÍA DE USO OPTIMIZADA
+# ==========================================
+with tab_guia:
+    st.title("💡 Cómo Sacarle el Máximo Provecho a la Terminal")
+    st.markdown("### Guía Práctica de Trabajo Diario en 4 Pasos")
+
+    st.markdown("""
+    <div class="quant-card">
+    <h4>Step 1: Escaneo de Percentiles y Asimetría de Suelo</h4>
+    <p>Revisa la tabla del <b>Explorador de Cartera Global</b> y filtra por <code>Solo Activos en Percentil Bajo (≤ 20%)</code>. Un activo con un percentil bajo está cotizando muy cerca de su mínimo anual de 52 semanas, lo que estadísticamente ofrece una asimetría riesgo/beneficio favorable para compras acumulativas.</p>
+    </div>
+
+    <div class="quant-card">
+    <h4>Step 2: Filtro Macro con Datos Económicos Relevantes</h4>
+    <p>Antes de ejecutar cualquier análisis, consulta la sección <b>Datos Económicos Relevantes de la Semana</b>. Compara el <code>Dato Anterior (Previo)</code> con la <code>Previsión (Esperado)</code> para anticipar sorpresas de alta volatilidad en divisas o índices clave.</p>
+    </div>
+
+    <div class="quant-card">
+    <h4>Step 3: Evaluación de Estrés y Cisne Negro con Michael Virtual</h4>
+    <p>Selecciona un activo y haz clic en <b>"Investigar Vulnerabilidades de Cisne Negro"</b>. Michael Virtual analizará la fragilidad estructural del activo evaluando riesgos geopolíticos, trampas de liquidez institucionales y rupturas en el VIX.</p>
+    </div>
+
+    <div class="quant-card">
+    <h4>Step 4: Dimensionamiento de Posición y Cálculo de Swap Overnight</h4>
+    <p>Utiliza la <b>Calculadora de Riesgo</b> introduciendo tu capital real, el apalancamiento que vas a usar y los días que mantendrás la posición abierta. Comprueba el <b>Costo Swap Neto</b> para asegurarte de que las comisiones por mantener la operación durante la noche no comprometan tu cuenta.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ==========================================
+# PESTAÑA 4: LEGAL, SOPORTE Y CONTACTO
+# ==========================================
+with tab_legal:
+    st.title("📄 Información Legal, Soporte y Contacto")
+
+    col_l1, col_l2 = st.columns(2)
+
+    with col_l1:
+        st.markdown("""
+        <div class="quant-card">
+        <h4>📬 Soporte Técnico y Consultas</h4>
+        <p>¿Tienes dudas sobre la licencia SaaS, sugerencias de nuevos activos o soporte técnico?</p>
+        <p>📧 <b>Correo Institucional:</b> <a href="mailto:soporte@marketradarquant.com" style="color: #58a6ff;">soporte@marketradarquant.com</a></p>
+        <p>🌐 <b>Web Oficial:</b> <a href="https://marketradarquant.com" target="_blank" style="color: #58a6ff;">www.marketradarquant.com</a></p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="quant-card">
+        <h4>☕ Apoya el Desarrollo del Proyecto</h4>
+        <p>Market Radar Quant Terminal se mantiene libre de publicidad invasiva gracias al apoyo de nuestra comunidad.</p>
+        <a href="https://www.buymeacoffee.com" target="_blank" class="yt-button" style="background-color: #21262d; border: 1px solid #30363d;">☕ Apoyar en BuyMeACoffee</a>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_l2:
+        st.markdown("""
+        <div class="quant-card">
+        <h4>⚖️ Descargo de Responsabilidad y Política de Privacidad</h4>
+        <p><b>Exención de Responsabilidad Financiera:</b> Todos los datos presentados son procesados mediante algoritmos matemáticos a partir de fuentes públicas. Ningún contenido generado por Michael Virtual constituye una recomendación explícita de compra o venta.</p>
+        <p><b>Política de Privacidad y Tratamiento de Datos:</b> No almacenamos contraseñas ni datos bancarios. Las consultas de los usuarios se procesan de forma anónima respetando la privacidad según el estándar internacional GDPR.</p>
+        </div>
+        """, unsafe_allow_html=True)
