@@ -15,6 +15,32 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# --- LOGOTIPO SVG NATIVO / FALLBACK ---
+LOGO_SVG = """
+<div style="text-align: center; padding: 10px 0;">
+    <svg width="70" height="70" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
+        <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
+        <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
+        <line x1="50" y1="5" x2="50" y2="95" stroke="#30363d" stroke-width="1.5" />
+        <line x1="5" y1="50" x2="95" y2="50" stroke="#30363d" stroke-width="1.5" />
+        <polygon points="50,50 85,20 70,10" fill="rgba(88, 166, 255, 0.4)" />
+        <circle cx="70" cy="30" r="4" fill="#f85149" />
+        <circle cx="35" cy="65" r="3" fill="#2ea043" />
+        <circle cx="50" cy="50" r="4" fill="#58a6ff" />
+    </svg>
+    <div style="font-weight: bold; font-size: 16px; color: #f0f6fc; margin-top: 5px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+</div>
+"""
+
+def mostrar_logo(container, width=120):
+    logo_path = "logo.png"
+    if os.path.exists(logo_path):
+        container.image(logo_path, width=width)
+    else:
+        container.markdown(LOGO_SVG, unsafe_allow_html=True)
+
 # --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
 ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"  # Reemplaza con tu Client ID real
 ADSENSE_SLOT_ID = "YYYYYYYYYY"               # Reemplaza con tu Slot ID real
@@ -49,14 +75,6 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; margin-bottom: 15px; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
-    
-    .black-swan-box {
-        background-color: #161b22;
-        border: 1px solid #da3633;
-        border-radius: 10px;
-        padding: 20px;
-        margin-top: 15px;
-    }
     
     .cal-card-v2 {
         background-color: #161b22;
@@ -106,10 +124,11 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
+    mostrar_logo(st)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -123,13 +142,11 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
-# --- BARRA LATERAL CON MONETIZACIÓN Y LOGO ---
-st.sidebar.title("🔐 Licencia SaaS")
-
-# Carga de Logo si existe
-logo_path = "logo.png"
-if os.path.exists(logo_path):
-    st.sidebar.image(logo_path, use_container_width=True)
+# --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
+with st.sidebar:
+    mostrar_logo(st, width=100)
+    st.markdown("---")
+    st.title("🔐 Licencia SaaS")
 
 user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
 selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
@@ -277,7 +294,6 @@ def obtener_noticias_rss(query_termino):
 def obtener_calendario_economico_dinamico():
     eventos = []
     try:
-        # Feed RSS de noticias y datos macroeconómicos en vivo
         url = "https://news.google.com/rss/search?q=calendario+economico+fed+bce+ipc+inflacion&hl=es&gl=ES&ceid=ES:es"
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -305,13 +321,12 @@ def obtener_calendario_economico_dinamico():
         pass
         
     if not eventos:
-        # Fallback dinámico basado en la fecha en tiempo real si el RSS no responde
         hoy = datetime.now()
         eventos = [
             {"Fecha": hoy.strftime("%d/%m/%Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria Fed", "Impacto": "🔴 Alto Impacto", "Link": "#"},
             {"Fecha": (hoy + timedelta(days=1)).strftime("%d/%m/%Y"), "Evento": "Publicación del Índice de Precios al Consumidor (IPC)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=2)).strftime("%Y-%m-%d"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=3)).strftime("%Y-%m-%d"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
+            {"Fecha": (hoy + timedelta(days=2)).strftime("%d/%m/%Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
+            {"Fecha": (hoy + timedelta(days=3)).strftime("%d/%m/%Y"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
         ]
     return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
@@ -325,13 +340,12 @@ tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
-    col_head1, col_head2 = st.columns([4, 1])
+    col_head1, col_head2 = st.columns([4, 1.2])
     with col_head1:
         st.title("📊 Market Radar Quant Terminal")
         st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
     with col_head2:
-        if os.path.exists(logo_path):
-            st.image(logo_path, width=140)
+        mostrar_logo(st, width=110)
 
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
@@ -390,7 +404,7 @@ with tab_terminal:
                 </div>
                 """, unsafe_allow_html=True)
 
-    # MÓDULO 3: MICHAEL VIRTUAL — TESIS FLUIDA & RADAR CISNE NEGRO LIMPIC
+    # MÓDULO 3: MICHAEL VIRTUAL — TESIS FLUIDA & RADAR CISNE NEGRO LIMPIO
     st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
 
     if not df_market_full.empty:
@@ -412,7 +426,6 @@ with tab_terminal:
                     """, unsafe_allow_html=True)
                     render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=120)
 
-                # DIAGNÓSTICO FLUIDO Y DINÁMICO BASADO EN VALORES
                 pct_1y = row_sel['Percentil 1Y (%)']
                 precio = row_sel['Precio Actual']
                 min_anual = row_sel['Mín 52 Sem']
@@ -450,7 +463,7 @@ with tab_terminal:
             else:
                 st.info("No hay noticias recientes indexadas.")
 
-        # RADAR CISNE NEGRO — INTERFAZ LIMPIDA SIN CÓDIGO HTML ROTO
+        # RADAR CISNE NEGRO — INTERFAZ LIMPIA NATIVA DE STREAMLIT
         st.markdown("---")
         st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
         
@@ -465,7 +478,6 @@ with tab_terminal:
             nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
             color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
 
-            # Formato de salida completamente limpio usando componentes nativos
             with st.container():
                 st.markdown(f"#### 🚨 Informe de Vulnerabilidad y Estrés Extremo: **{row_sel['Activo']}**")
                 st.markdown(f"**Índice de Fragilidad Cuantitativa:** <span style='color:{color_vulnerabilidad}; font-weight:bold;'>{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span>", unsafe_allow_html=True)
