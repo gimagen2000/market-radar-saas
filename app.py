@@ -55,13 +55,13 @@ def mostrar_logo(container, width=180, center=False):
 # --- MÓDULO DE BINANCE PAY (CAFÉ 3 USDT) ---
 def mostrar_binance_pay(container):
     qr_path = "qr_binance.png"
-    container.markdown("#### ☕ Apoya el Proyecto (3 USDT)")
-    container.markdown("<p style='font-size: 13px; color: #8b949e;'>Market Radar es una herramienta independiente. Escanea este código desde tu app de Binance para invitar un café al desarrollador.</p>", unsafe_allow_html=True)
+    container.markdown("<h4 style='text-align:center;'>☕ Invitar un Café (3 USDT)</h4>", unsafe_allow_html=True)
     if os.path.exists(qr_path):
-        container.image(qr_path, width=250)
+        col1, col2, col3 = container.columns([1, 4, 1])
+        col2.image(qr_path, use_container_width=True)
     else:
-        container.warning("⚠️ Guarda tu imagen del QR de Binance como 'qr_binance.png' en esta carpeta para que se muestre aquí.")
-    container.markdown("<p style='font-size: 11px; color: #3fb950; font-weight: bold;'>Red Binance Pay — Cero comisiones</p>", unsafe_allow_html=True)
+        container.warning("⚠️ Guarda tu imagen 'qr_binance.png' en esta carpeta.")
+    container.markdown("<p style='font-size: 12px; color: #f3ba2f; font-weight: bold; text-align:center;'>Red Binance Pay — Cero comisiones</p>", unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
 ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"
@@ -161,7 +161,6 @@ if st.session_state.user_plan == "Free":
     
 # --- CARTERA COMPLETA DE ACTIVOS GLOBALES (FUSIÓN TOTAL) ---
 ACTIVOS_TICKERS = {
-    # Acciones / Tech Giants
     "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
     "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
     "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
@@ -173,7 +172,6 @@ ACTIVOS_TICKERS = {
     "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
     "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, 
 
-    # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
@@ -182,7 +180,6 @@ ACTIVOS_TICKERS = {
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
 
-    # Forex Minors / Cruces (Restaurados)
     "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
     "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
     "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
@@ -191,12 +188,10 @@ ACTIVOS_TICKERS = {
     "CAD/JPY": {"ticker": "CADJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CAD JPY canadiense yen", "swap_long": 3.0, "swap_short": -4.9},
     "CHF/JPY": {"ticker": "CHFJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CHF JPY franco yen", "swap_long": 1.8, "swap_short": -3.5},
 
-    # Forex Emergentes & LATAM
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
     "USD/BRL": {"ticker": "USDBRL=X", "clase": "Forex", "cot": "Neutral", "query": "USD BRL dolar real brasileno", "swap_long": 10.5, "swap_short": -14.0},
 
-    # Índices Globales (Restaurados completos)
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
@@ -204,7 +199,6 @@ ACTIVOS_TICKERS = {
     "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
     "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
 
-    # Commodities Energéticos, Metales y Agrícolas (Restaurados completos)
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
@@ -220,7 +214,6 @@ ACTIVOS_TICKERS = {
     "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
     "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
 
-    # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
@@ -290,7 +283,6 @@ def obtener_noticias_rss(query_termino):
 def obtener_calendario_economico_dinamico():
     hoy = datetime.now()
     
-    # Calcular días exactos de la semana en curso
     lunes = hoy - timedelta(days=hoy.weekday())
     martes = lunes + timedelta(days=1)
     miercoles = lunes + timedelta(days=2)
@@ -529,6 +521,31 @@ with tab_terminal:
             <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
         </div>
         """, unsafe_allow_html=True)
+        
+    # --- MÓDULO EXTRA: DONACIÓN / BINANCE PAY (PÁGINA PRINCIPAL) ---
+    st.markdown("---")
+    st.header("☕ Apoya a Market Radar Quant Terminal")
+    col_don1, col_don2 = st.columns([1.5, 1])
+    
+    with col_don1:
+        st.markdown("""
+        <div class="quant-card">
+        <h4>⚡ Financiamiento Independiente</h4>
+        <p style="font-size: 14px; color: #c9d1d9;">Market Radar es una herramienta de código abierto desarrollada de forma independiente para la comunidad Quant. Si esta terminal te ha ayudado a proteger tu capital o identificar oportunidades de acumulación, puedes invitarle un café al desarrollador.</p>
+        <p style="font-size: 14px; color: #c9d1d9; margin-top: 10px;"><b>Instrucciones:</b></p>
+        <ol style="font-size: 13px; color: #8b949e;">
+            <li>Abre tu aplicación de <b>Binance</b> en el móvil.</li>
+            <li>Selecciona el ícono del escáner (Binance Pay) en la esquina superior derecha de la app.</li>
+            <li>Escanea el código QR de la derecha.</li>
+            <li>Confirma el envío de <b>3 USDT</b> (sin comisiones por usar la red interna de Pay).</li>
+        </ol>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with col_don2:
+        st.markdown("<div class='quant-card' style='text-align: center; padding: 10px;'>", unsafe_allow_html=True)
+        mostrar_binance_pay(st)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ==========================================
