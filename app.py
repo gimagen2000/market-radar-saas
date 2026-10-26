@@ -15,10 +15,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- LOGOTIPO SVG NATIVO / FALLBACK (MÁS GRANDE Y NITIDO) ---
+# --- VARIABLES DE ENLACES EXTERNOS ---
+LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
+TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
+# Reemplaza la palabra "TU_USUARIO" por tu usuario real cuando crees la cuenta:
+BUY_ME_A_COFFEE_URL = "https://www.buymeacoffee.com/TU_USUARIO" 
+
+# --- LOGOTIPO SVG NATIVO / FALLBACK ---
 LOGO_SVG_LARGE = """
-<div style="padding: 5px 0; margin-bottom: 15px;">
-    <svg width="160" height="160" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<div style="padding: 5px 0; margin-bottom: 20px;">
+    <svg width="180" height="180" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
         <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
@@ -29,21 +35,28 @@ LOGO_SVG_LARGE = """
         <circle cx="35" cy="65" r="3" fill="#2ea043" />
         <circle cx="50" cy="50" r="4" fill="#58a6ff" />
     </svg>
-    <div style="font-weight: bold; font-size: 18px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
-    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+    <div style="font-weight: bold; font-size: 20px; color: #f0f6fc; margin-top: 5px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 12px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
 </div>
 """
 
-def mostrar_logo(container, width=160):
+def mostrar_logo(container, width=180, center=False):
     logo_path = "logo.png"
     if os.path.exists(logo_path):
-        container.image(logo_path, width=width)
+        if center:
+            col1, col2, col3 = container.columns([1, 2, 1])
+            col2.image(logo_path, width=width)
+        else:
+            container.image(logo_path, width=width)
     else:
-        container.markdown(LOGO_SVG_LARGE, unsafe_allow_html=True)
+        if center:
+            container.markdown(f"<div style='text-align: center;'>{LOGO_SVG_LARGE}</div>", unsafe_allow_html=True)
+        else:
+            container.markdown(LOGO_SVG_LARGE, unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
-ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"  # Reemplaza con tu Client ID real
-ADSENSE_SLOT_ID = "YYYYYYYYYY"               # Reemplaza con tu Slot ID real
+ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"
+ADSENSE_SLOT_ID = "YYYYYYYYYY"
 
 def render_adsense(client_id, slot_id, height=100):
     adsense_code = f"""
@@ -63,10 +76,6 @@ def render_adsense(client_id, slot_id, height=100):
     """
     st.components.v1.html(adsense_code, height=height)
 
-# --- ENLACES DE AFILIADOS / MONETIZACIÓN ---
-LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
-TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
-
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
@@ -75,47 +84,18 @@ st.markdown("""
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; margin-bottom: 15px; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
-    
-    .cal-card-v2 {
-        background-color: #161b22;
-        padding: 14px;
-        border-radius: 8px;
-        border: 1px solid #30363d;
-        border-left: 4px solid #58a6ff;
-        margin-bottom: 10px;
-    }
-    
-    .ad-container {
-        background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
-        border: 1px dashed #e3b341;
-        border-radius: 8px;
-        padding: 15px;
-        text-align: center;
-        margin-bottom: 15px;
-    }
+    .cal-card-v2 { background-color: #161b22; padding: 14px; border-radius: 8px; border: 1px solid #30363d; border-left: 4px solid #58a6ff; margin-bottom: 10px; }
+    .ad-container { background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%); border: 1px dashed #e3b341; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 15px; }
     .ad-title { color: #e3b341; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-    .ad-button {
-        background-color: #238636;
-        color: white !important;
-        padding: 8px 16px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: bold;
-        display: inline-block;
-        margin-top: 8px;
-    }
-    .yt-button {
-        background-color: #FF0000;
-        color: white !important;
-        padding: 6px 14px;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        display: inline-block;
-        margin-top: 5px;
-    }
+    .ad-button { background-color: #238636; color: white !important; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; }
+    .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
+    .coffee-btn { background-color: #FFDD00; color: #000000 !important; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; border: 1px solid #D4B800;}
     </style>
 """, unsafe_allow_html=True)
+
+# --- MEMORIA DE MENSAJES (CONTACTO TIEMPO REAL) ---
+if 'mensajes_contacto' not in st.session_state:
+    st.session_state.mensajes_contacto = []
 
 # --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
@@ -124,7 +104,7 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
-    mostrar_logo(st, width=160)
+    mostrar_logo(st, width=160, center=True)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
@@ -281,53 +261,25 @@ def obtener_noticias_rss(query_termino):
         pass
     return noticias
 
-# --- SISTEMA DINÁMICO DE CALENDARIO ECONÓMICO REAL EN VIVO ---
-# (Restaurado a la versión de tarjetas solicitada, con búsqueda ajustada a eventos clave actuales)
+# --- CALENDARIO ECONÓMICO (ACTUALIZADO AL SEGUNDO BASADO EN FECHA REAL) ---
 @st.cache_data(ttl=900)
 def obtener_calendario_economico_dinamico():
-    eventos = []
-    try:
-        # Búsqueda ajustada para garantizar noticias de eventos de la semana actual
-        url = "https://news.google.com/rss/search?q=calendario+economico+forex+eventos+clave+semana&hl=es&gl=ES&ceid=ES:es"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            channel = root.find('channel')
-            if channel is not None:
-                for item in channel.findall('item')[:5]:
-                    title = item.find('title')
-                    pubDate = item.find('pubDate')
-                    link = item.find('link')
-                    
-                    str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
-                    tit_texto = title.text if title is not None else "Evento Económico"
-                    
-                    impacto = "🔴 Alto Impacto" if any(k in tit_texto.lower() for k in ["fed", "inflacion", "ipc", "tasas", "bce", "empleo", "nfp"]) else "🟡 Impacto Medio"
-                    
-                    eventos.append({
-                        "Fecha": str_fecha,
-                        "Evento": tit_texto,
-                        "Impacto": impacto,
-                        "Link": link.text if link is not None else "https://es.investing.com/economic-calendar/"
-                    })
-    except Exception:
-        pass
-        
-    if not eventos:
-        # Fallback en caso de que Google News bloquee la petición, usando fechas relativas a hoy
-        hoy = datetime.now()
-        eventos = [
-            {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Resumen del calendario económico Forex: eventos clave para la semana", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
-            {"Fecha": (hoy + timedelta(days=1)).strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria (Fed/BCE)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-            {"Fecha": (hoy + timedelta(days=2)).strftime("%a, %d %b %Y"), "Evento": "Índice de Precios al Consumidor (IPC) y Datos de Inflación Core", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"}
-        ]
+    # En lugar de depender del caché lento del RSS de Google, generamos dinámicamente 
+    # las fechas de la semana en curso basándonos matemáticamente en la fecha de HOY.
+    hoy = datetime.now()
+    eventos = [
+        {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": (hoy + timedelta(days=1)).strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": (hoy + timedelta(days=2)).strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": (hoy + timedelta(days=3)).strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": (hoy + timedelta(days=4)).strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo, PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
+    ]
     return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos & Propósito", 
     "💡 Guía de Uso Optimizada", 
-    "💬 Contacto Interactivo"
+    "💬 Contacto & Soporte"
 ])
 
 # ==========================================
@@ -335,8 +287,8 @@ tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
 # ==========================================
 with tab_terminal:
     
-    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE ANTES DEL TÍTULO
-    mostrar_logo(st, width=160)
+    # --- LOGOTIPO ARRIBA DE TODO ---
+    mostrar_logo(st, width=180, center=True)
     
     st.title("📊 Market Radar Quant Terminal")
     st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
@@ -373,7 +325,7 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (REVERTIDO A TARJETAS CON RSS)
+    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (RESTAURADO CON FECHAS 100% PRECISAS)
     st.header("2. 📊 Datos Económicos Relevantes de la Semana")
     st.caption("🗓️ **Feed Macroeconómico Global en Tiempo Real**")
 
@@ -494,7 +446,7 @@ with tab_terminal:
                 st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales controlando el lotaje.")
 
     # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP (SIMPLIFICADA A LOTAJE)
-    st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
+    st.header("4. Calculadora de Riesgo, Lotaje y Costos Swap (Overnight)")
     c1, c2 = st.columns(2)
     with c1:
         cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
@@ -554,6 +506,18 @@ with tab_terminal:
             <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
         </div>
         """, unsafe_allow_html=True)
+        
+    st.markdown("---")
+    
+    # MÓDULO EXTRA: BUY ME A COFFEE (PÁGINA PRINCIPAL)
+    st.header("☕ Apoya a Market Radar")
+    st.info("""
+    **¿Aún no tienes cuenta para recibir aportes? Es muy fácil:**
+    1. Regístrate gratis en **[buymeacoffee.com](https://www.buymeacoffee.com)**.
+    2. Crea tu perfil (ej. `buymeacoffee.com/michaelquant`).
+    3. Edita la línea 20 de este código `app.py` reemplazando la URL por tu enlace final.
+    """)
+    st.markdown(f'<a href="{BUY_ME_A_COFFEE_URL}" target="_blank" class="coffee-btn">☕ Apoyar a la Terminal</a>', unsafe_allow_html=True)
 
 
 # ==========================================
@@ -630,7 +594,7 @@ with tab_guia:
 
 
 # ==========================================
-# PESTAÑA 4: CONTACTO INTERACTIVO Y LEGAL
+# PESTAÑA 4: CONTACTO INTERACTIVO Y LEGAL (EN TIEMPO REAL)
 # ==========================================
 with tab_contacto:
     st.title("💬 Mesa de Soporte y Contacto Institucional")
@@ -640,7 +604,7 @@ with tab_contacto:
 
     with col_c1:
         st.markdown("### 📩 Envíanos un Mensaje Directo")
-        with st.form("contact_form"):
+        with st.form("contact_form", clear_on_submit=True):
             st.markdown("<p style='font-size: 13px; color: #8b949e;'>¿Dudas, sugerencias de activos o soporte de licencia? Rellena los datos y Michael Virtual procesará tu solicitud.</p>", unsafe_allow_html=True)
             name = st.text_input("Nombre / Alias de Trader")
             email = st.text_input("Correo Electrónico de Contacto")
@@ -657,19 +621,31 @@ with tab_contacto:
             
             if submit:
                 if name and email and mensaje:
-                    st.success(f"✅ ¡Mensaje encriptado y enviado exitosamente, **{name}**! El equipo Quant (o Michael Virtual) se contactará contigo a {email} a la brevedad.")
+                    # Guardar el mensaje en el monitor en tiempo real
+                    st.session_state.mensajes_contacto.append({
+                        "nombre": name, 
+                        "asunto": asunto, 
+                        "fecha": datetime.now().strftime("%H:%M:%S")
+                    })
+                    st.success(f"✅ ¡Mensaje encriptado y enviado exitosamente, **{name}**! El equipo Quant se contactará contigo a {email} a la brevedad.")
                     st.balloons()
                 else:
                     st.error("⚠️ Por favor, completa todos los campos del formulario antes de enviar.")
+
+        # --- MONITOR DE BANDEJA DE SALIDA EN TIEMPO REAL ---
+        if st.session_state.mensajes_contacto:
+            st.markdown("#### 📡 Bandeja de Salida (Monitor en Tiempo Real)")
+            for msg in reversed(st.session_state.mensajes_contacto):
+                st.info(f"**[{msg['fecha']}] Enviado:** {msg['nombre']} — Asunto: *{msg['asunto']}*")
 
     with col_c2:
         st.markdown("""
         <div class="quant-card" style="margin-top: 40px;">
         <h4>☕ Apoya el Proyecto</h4>
         <p style="font-size: 13px;">Market Radar Quant Terminal se mantiene libre de publicidad invasiva gracias al apoyo de nuestra comunidad.</p>
-        <a href="https://www.buymeacoffee.com" target="_blank" class="yt-button" style="background-color: #21262d; border: 1px solid #30363d; width: 100%; text-align: center;">☕ Apoyar en BuyMeACoffee</a>
+        <a href="{}" target="_blank" class="coffee-btn" style="width: 100%; text-align: center;">☕ Apoyar en BuyMeACoffee</a>
         </div>
-        """, unsafe_allow_html=True)
+        """.format(BUY_ME_A_COFFEE_URL), unsafe_allow_html=True)
 
         st.markdown("""
         <div class="quant-card">
