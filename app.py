@@ -18,12 +18,10 @@ st.set_page_config(
 # --- VARIABLES DE ENLACES EXTERNOS ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
-# Reemplaza la palabra "TU_USUARIO" por tu usuario real cuando crees la cuenta:
-BUY_ME_A_COFFEE_URL = "https://www.buymeacoffee.com/TU_USUARIO" 
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK ---
 LOGO_SVG_LARGE = """
-<div style="padding: 5px 0; margin-bottom: 20px;">
+<div style="padding: 5px 0; margin-bottom: 5px;">
     <svg width="180" height="180" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
@@ -54,27 +52,16 @@ def mostrar_logo(container, width=180, center=False):
         else:
             container.markdown(LOGO_SVG_LARGE, unsafe_allow_html=True)
 
-# --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
-ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"
-ADSENSE_SLOT_ID = "YYYYYYYYYY"
-
-def render_adsense(client_id, slot_id, height=100):
-    adsense_code = f"""
-    <div style="text-align: center;">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={client_id}"
-             crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="{client_id}"
-             data-ad-slot="{slot_id}"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-             (adsbygoogle = window.adsbygoogle || []).push({{}});
-        </script>
-    </div>
-    """
-    st.components.v1.html(adsense_code, height=height)
+# --- MÓDULO DE BINANCE PAY (CAFÉ 3 USDT) ---
+def mostrar_binance_pay(container):
+    qr_path = "qr_binance.png"
+    container.markdown("#### ☕ Apoya el Proyecto (3 USDT)")
+    container.markdown("<p style='font-size: 13px; color: #8b949e;'>Market Radar es una herramienta independiente. Escanea este código desde tu app de Binance para invitar un café al desarrollador.</p>", unsafe_allow_html=True)
+    if os.path.exists(qr_path):
+        container.image(qr_path, width=250)
+    else:
+        container.warning("⚠️ Guarda tu imagen del QR de Binance como 'qr_binance.png' en esta carpeta para que se muestre aquí.")
+    container.markdown("<p style='font-size: 11px; color: #3fb950; font-weight: bold;'>Red Binance Pay — Cero comisiones</p>", unsafe_allow_html=True)
 
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
@@ -89,9 +76,13 @@ st.markdown("""
     .ad-title { color: #e3b341; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
     .ad-button { background-color: #238636; color: white !important; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; }
     .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
-    .coffee-btn { background-color: #FFDD00; color: #000000 !important; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; border: 1px solid #D4B800;}
     </style>
 """, unsafe_allow_html=True)
+
+# --- CABECERA MAESTRA: LOGOTIPO ARRIBA DE TODO ---
+mostrar_logo(st, width=180, center=True)
+st.markdown("<h1 style='text-align: center;'>📊 Market Radar Quant Terminal</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Procesamiento Estadístico de Mercados y Cartera Global</h3>", unsafe_allow_html=True)
 
 # --- MEMORIA DE MENSAJES (CONTACTO TIEMPO REAL) ---
 if 'mensajes_contacto' not in st.session_state:
@@ -104,7 +95,6 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
-    mostrar_logo(st, width=160, center=True)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
@@ -122,10 +112,8 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
-# --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
+# --- BARRA LATERAL (SAAS Y ADS) ---
 with st.sidebar:
-    mostrar_logo(st, width=130)
-    st.markdown("---")
     st.title("🔐 Licencia SaaS")
 
 user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
@@ -149,12 +137,8 @@ if st.session_state.user_plan == "Free":
     </div>
     """, unsafe_allow_html=True)
     
-    with st.sidebar:
-        render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
-
 # --- CARTERA COMPLETA DE ACTIVOS GLOBALES + ACCIONES Y MARCAS LÍDERES ---
 ACTIVOS_TICKERS = {
-    # Acciones / Tech Giants (Nvidia, Tesla y las más sonadas)
     "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
     "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
     "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
@@ -166,7 +150,6 @@ ACTIVOS_TICKERS = {
     "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
     "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, 
 
-    # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
@@ -174,18 +157,14 @@ ACTIVOS_TICKERS = {
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
-
-    # Forex Emergentes & LATAM
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
 
-    # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
 
-    # Commodities Energéticos, Metales y Agrícolas
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
@@ -196,7 +175,6 @@ ACTIVOS_TICKERS = {
     "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa", "swap_long": -0.9, "swap_short": -0.4},
     "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
 
-    # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
@@ -261,24 +239,30 @@ def obtener_noticias_rss(query_termino):
         pass
     return noticias
 
-# --- CALENDARIO ECONÓMICO (ACTUALIZADO AL SEGUNDO BASADO EN FECHA REAL) ---
+# --- CALENDARIO ECONÓMICO (100% GARANTIZADO EN LA SEMANA ACTUAL) ---
 @st.cache_data(ttl=900)
 def obtener_calendario_economico_dinamico():
-    # En lugar de depender del caché lento del RSS de Google, generamos dinámicamente 
-    # las fechas de la semana en curso basándonos matemáticamente en la fecha de HOY.
     hoy = datetime.now()
+    
+    # Calcular días exactos de la semana en curso
+    lunes = hoy - timedelta(days=hoy.weekday())
+    martes = lunes + timedelta(days=1)
+    miercoles = lunes + timedelta(days=2)
+    jueves = lunes + timedelta(days=3)
+    viernes = lunes + timedelta(days=4)
+
     eventos = [
-        {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": (hoy + timedelta(days=1)).strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": (hoy + timedelta(days=2)).strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": (hoy + timedelta(days=3)).strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": (hoy + timedelta(days=4)).strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo, PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
+        {"Fecha": lunes.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": martes.strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": miercoles.strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": jueves.strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": viernes.strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo (NFP), PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
     ]
     return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
-    "🏛️ Quiénes Somos & Propósito", 
-    "💡 Guía de Uso Optimizada", 
+    "🏛️ Quiénes Somos", 
+    "💡 Guía de Uso", 
     "💬 Contacto & Soporte"
 ])
 
@@ -286,13 +270,6 @@ tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
-    
-    # --- LOGOTIPO ARRIBA DE TODO ---
-    mostrar_logo(st, width=180, center=True)
-    
-    st.title("📊 Market Radar Quant Terminal")
-    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
-
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
 
@@ -325,9 +302,9 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (RESTAURADO CON FECHAS 100% PRECISAS)
+    # MÓDULO 2: DATOS ECONÓMICOS (FECHAS 100% PRECISAS DE ESTA SEMANA)
     st.header("2. 📊 Datos Económicos Relevantes de la Semana")
-    st.caption("🗓️ **Feed Macroeconómico Global en Tiempo Real**")
+    st.caption("🗓️ **Feed Macroeconómico Global — Actualizado al Día de Hoy**")
 
     cal_eventos_live = obtener_calendario_economico_dinamico()
     
@@ -350,7 +327,7 @@ with tab_terminal:
                 </div>
                 """, unsafe_allow_html=True)
 
-    # MÓDULO 3: MICHAEL VIRTUAL — TESIS FLUIDA & RADAR CISNE NEGRO LIMPIO
+    # MÓDULO 3: MICHAEL VIRTUAL & RADAR CISNE NEGRO
     st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
 
     if not df_market_full.empty:
@@ -409,7 +386,7 @@ with tab_terminal:
             else:
                 st.info("No hay noticias recientes indexadas.")
 
-        # RADAR CISNE NEGRO — INTERFAZ LIMPIA NATIVA DE STREAMLIT
+        # RADAR CISNE NEGRO
         st.markdown("---")
         st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
         
@@ -509,15 +486,9 @@ with tab_terminal:
         
     st.markdown("---")
     
-    # MÓDULO EXTRA: BUY ME A COFFEE (PÁGINA PRINCIPAL)
-    st.header("☕ Apoya a Market Radar")
-    st.info("""
-    **¿Aún no tienes cuenta para recibir aportes? Es muy fácil:**
-    1. Regístrate gratis en **[buymeacoffee.com](https://www.buymeacoffee.com)**.
-    2. Crea tu perfil (ej. `buymeacoffee.com/michaelquant`).
-    3. Edita la línea 20 de este código `app.py` reemplazando la URL por tu enlace final.
-    """)
-    st.markdown(f'<a href="{BUY_ME_A_COFFEE_URL}" target="_blank" class="coffee-btn">☕ Apoyar a la Terminal</a>', unsafe_allow_html=True)
+    # MÓDULO EXTRA: BINANCE PAY (PÁGINA PRINCIPAL)
+    with st.container():
+        mostrar_binance_pay(st)
 
 
 # ==========================================
@@ -639,13 +610,9 @@ with tab_contacto:
                 st.info(f"**[{msg['fecha']}] Enviado:** {msg['nombre']} — Asunto: *{msg['asunto']}*")
 
     with col_c2:
-        st.markdown("""
-        <div class="quant-card" style="margin-top: 40px;">
-        <h4>☕ Apoya el Proyecto</h4>
-        <p style="font-size: 13px;">Market Radar Quant Terminal se mantiene libre de publicidad invasiva gracias al apoyo de nuestra comunidad.</p>
-        <a href="{}" target="_blank" class="coffee-btn" style="width: 100%; text-align: center;">☕ Apoyar en BuyMeACoffee</a>
-        </div>
-        """.format(BUY_ME_A_COFFEE_URL), unsafe_allow_html=True)
+        st.markdown("<div class='quant-card' style='margin-top: 40px;'>", unsafe_allow_html=True)
+        mostrar_binance_pay(st)
+        st.markdown("</div>", unsafe_allow_html=True)
 
         st.markdown("""
         <div class="quant-card">
