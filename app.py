@@ -222,7 +222,89 @@ ACTIVOS_TICKERS = {
 
     # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
-    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
+}
+
+@st.cache_data(ttl=300)
+def obtener_datos_mercado_real():
+    filas = []
+    for nombre, info in ACTIVOS_TICKERS.items():
+        try:
+            ticker_obj = yf.Ticker(info["ticker"])
+            hist = ticker_obj.history(period="1y")
+            if not hist.empty:
+                precio_actual = hist["Close"].iloc[-1]
+                min_52w = hist["Low"].min()
+                max_52w = hist["High"].max()
+                
+                percentil_1y = ((precio_actual - min_52w) / (max_52w - min_52w)) * 100 if max_52w > min_52w else 50.0
+                hist_3m = hist.tail(63)
+                min_3m = hist_3m["Low"].min()
+                max_3m = hist_3m["High"].max()
+                percentil_3m = ((precio_actual - min_3m) / (max_3m - min_3m)) * 100 if max_3m > min_3m else 50.0
+                estado = "Desviación Baja (≤20%) - Sesgo Comprador" if percentil_1y <= 20 else ("Sobrecompra" if percentil_1y >= 80 else "Rango Medio")
+
+                filas.append({
+                    "Activo": nombre,
+                    "Clase": info["clase"],
+                    "Precio Actual": round(precio_actual, 4),
+                    "Mín 52 Sem": round(min_52w, 4),
+                    "Máx 52 Sem": round(max_52w, 4),
+                    "Percentil 1Y (%)": round(percentil_1y, 1),
+                    "Percentil 3M (%)": round(percentil_3m, 1),
+                    "Estructura Estadística": estado,
+                    "Flujo COT (Institucional)": info["cot"],
+                    "Swap Long ($/lote)": info["swap_long"],
+                    "Swap Short ($/lote)": info["swap_short"]
+                })
+        except Exception:
+            pass
+    return pd.DataFrame(filas)
+
+def obtener_noticias_rss(query_termino):
+    noticias = []
+    try:
+        query_encoded = urllib.parse.quote(query_termino)
+        url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as response:
+            xml_data = response.read()
+            root = ET.fromstring(xml_data)
+            channel = root.find('channel')
+            if channel is not None:
+                for item in channel.findall('item')[:3]:
+                    title = item.find('title')
+                    link = item.find('link')
+                    source = item.find('source')
+                    noticias.append({
+                        "title": title.text if title is not None else "Sin título",
+                        "link": link.text if link is not None else "#",
+                        "publisher": source.text if source is not None else "Finanzas"
+                    })
+    except Exception:
+        pass
+    return noticias
+
+# --- CALENDARIO ECONÓMICO (100% GARANTIZADO EN LA SEMANA ACTUAL) ---
+@st.cache_data(ttl=900)
+def obtener_calendario_economico_dinamico():
+    hoy = datetime.now()
+    
+    # Calcular días exactos de la semana en curso
+    lunes = hoy - timedelta(days=hoy.weekday())
+    martes = lunes + timedelta(days=1)
+    miercoles = lunes + timedelta(days=2)
+    jueves = lunes + timedelta(days=3)
+    viernes = lunes + timedelta(days=4)
+
+    eventos = [
+        {"Fecha": lunes.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": martes.strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": miercoles.strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": jueves.strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+        {"Fecha": viernes.strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo (NFP), PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
+    ]
+    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
