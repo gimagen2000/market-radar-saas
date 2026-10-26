@@ -17,8 +17,8 @@ st.set_page_config(
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK (MÁS GRANDE Y NITIDO) ---
 LOGO_SVG_LARGE = """
-<div style="padding: 5px 0; margin-bottom: 15px;">
-    <svg width="160" height="160" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<div style="padding: 0; margin-bottom: 15px;">
+    <svg width="150" height="150" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
         <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
@@ -29,12 +29,12 @@ LOGO_SVG_LARGE = """
         <circle cx="35" cy="65" r="3" fill="#2ea043" />
         <circle cx="50" cy="50" r="4" fill="#58a6ff" />
     </svg>
-    <div style="font-weight: bold; font-size: 18px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
-    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+    <div style="font-weight: bold; font-size: 16px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
 </div>
 """
 
-def mostrar_logo(container, width=160):
+def mostrar_logo(container, width=150):
     logo_path = "logo.png"
     if os.path.exists(logo_path):
         container.image(logo_path, width=width)
@@ -76,15 +76,6 @@ st.markdown("""
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; margin-bottom: 15px; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
     
-    .cal-card-v2 {
-        background-color: #161b22;
-        padding: 14px;
-        border-radius: 8px;
-        border: 1px solid #30363d;
-        border-left: 4px solid #58a6ff;
-        margin-bottom: 10px;
-    }
-    
     .ad-container {
         background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
         border: 1px dashed #e3b341;
@@ -117,6 +108,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- CABECERA PRINCIPAL (LOGO ARRIBA A LA IZQUIERDA) ---
+col_logo_main, col_title_main = st.columns([1, 5])
+with col_logo_main:
+    mostrar_logo(st, width=150)
+with col_title_main:
+    st.title("📊 Market Radar Quant Terminal")
+    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
+
+st.markdown("---")
+
 # --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
@@ -124,7 +125,6 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
-    mostrar_logo(st, width=160)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
@@ -142,9 +142,9 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
-# --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
+# --- BARRA LATERAL ---
 with st.sidebar:
-    mostrar_logo(st, width=130)
+    mostrar_logo(st, width=120)
     st.markdown("---")
     st.title("🔐 Licencia SaaS")
 
@@ -174,7 +174,7 @@ if st.session_state.user_plan == "Free":
 
 # --- CARTERA COMPLETA DE ACTIVOS GLOBALES + ACCIONES Y MARCAS LÍDERES ---
 ACTIVOS_TICKERS = {
-    # Acciones / Tech Giants (Nvidia, Tesla y las más sonadas)
+    # Acciones / Tech Giants
     "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
     "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
     "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
@@ -184,7 +184,7 @@ ACTIVOS_TICKERS = {
     "Meta Platforms": {"ticker": "META", "clase": "Acción / Tech", "cot": "Neto Comprador (+15k)", "query": "Meta Platforms stock", "swap_long": -3.0, "swap_short": 1.0},
     "Palantir (PLTR)": {"ticker": "PLTR", "clase": "Acción / Tech", "cot": "Neto Comprador (+25k)", "query": "Palantir PLTR stock", "swap_long": -4.0, "swap_short": 1.2},
     "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
-    "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, # Nota: Referencia de seguimiento analítico vía Tesla / sector espacial
+    "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0},
 
     # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
@@ -195,27 +195,15 @@ ACTIVOS_TICKERS = {
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
 
-    # Forex Minors / Cruces
-    "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
-    "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
-    "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
-    "AUD/JPY": {"ticker": "AUDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "AUD JPY australiano yen", "swap_long": 2.5, "swap_short": -4.1},
-    "NZD/JPY": {"ticker": "NZDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "NZD JPY neozelandes yen", "swap_long": 2.2, "swap_short": -3.8},
-    "CAD/JPY": {"ticker": "CADJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CAD JPY canadiense yen", "swap_long": 3.0, "swap_short": -4.9},
-    "CHF/JPY": {"ticker": "CHFJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CHF JPY franco yen", "swap_long": 1.8, "swap_short": -3.5},
-
     # Forex Emergentes & LATAM
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
-    "USD/BRL": {"ticker": "USDBRL=X", "clase": "Forex", "cot": "Neutral", "query": "USD BRL dolar real brasileno", "swap_long": 10.5, "swap_short": -14.0},
 
     # Índices Globales
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
-    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
-    "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
 
     # Commodities Energéticos, Metales y Agrícolas
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
@@ -224,14 +212,9 @@ ACTIVOS_TICKERS = {
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion", "swap_long": -3.1, "swap_short": 1.0},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion", "swap_long": -2.5, "swap_short": 0.8},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion", "swap_long": -1.0, "swap_short": -0.3},
-    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado", "swap_long": -1.4, "swap_short": -0.2},
     "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado", "swap_long": -0.8, "swap_short": -0.5},
     "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa", "swap_long": -0.9, "swap_short": -0.4},
-    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado", "swap_long": -0.6, "swap_short": -0.3},
     "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
-    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
-    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
-    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
 
     # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
@@ -251,12 +234,10 @@ def obtener_datos_mercado_real():
                 max_52w = hist["High"].max()
                 
                 percentil_1y = ((precio_actual - min_52w) / (max_52w - min_52w)) * 100 if max_52w > min_52w else 50.0
-
                 hist_3m = hist.tail(63)
                 min_3m = hist_3m["Low"].min()
                 max_3m = hist_3m["High"].max()
                 percentil_3m = ((precio_actual - min_3m) / (max_3m - min_3m)) * 100 if max_3m > min_3m else 50.0
-
                 estado = "Desviación Baja (≤20%) - Sesgo Comprador" if percentil_1y <= 20 else ("Sobrecompra" if percentil_1y >= 80 else "Rango Medio")
 
                 filas.append({
@@ -291,7 +272,6 @@ def obtener_noticias_rss(query_termino):
                     title = item.find('title')
                     link = item.find('link')
                     source = item.find('source')
-                    
                     noticias.append({
                         "title": title.text if title is not None else "Sin título",
                         "link": link.text if link is not None else "#",
@@ -300,47 +280,6 @@ def obtener_noticias_rss(query_termino):
     except Exception:
         pass
     return noticias
-
-# --- SISTEMA DINÁMICO DE CALENDARIO ECONÓMICO REAL EN VIVO ---
-@st.cache_data(ttl=900)
-def obtener_calendario_economico_dinamico():
-    eventos = []
-    try:
-        url = "https://news.google.com/rss/search?q=calendario+economico+fed+bce+ipc+inflacion&hl=es&gl=ES&ceid=ES:es"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            channel = root.find('channel')
-            if channel is not None:
-                for item in channel.findall('item')[:6]:
-                    title = item.find('title')
-                    pubDate = item.find('pubDate')
-                    link = item.find('link')
-                    
-                    str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
-                    tit_texto = title.text if title is not None else "Evento Económico"
-                    
-                    impacto = "🔴 Alto Impacto" if any(k in tit_texto.lower() for k in ["fed", "inflacion", "ipc", "tasas", "bce", "empleo"]) else "🟡 Impacto Medio"
-                    
-                    eventos.append({
-                        "Fecha": str_fecha,
-                        "Evento": tit_texto,
-                        "Impacto": impacto,
-                        "Link": link.text if link is not None else "#"
-                    })
-    except Exception:
-        pass
-        
-    if not eventos:
-        hoy = datetime.now()
-        eventos = [
-            {"Fecha": hoy.strftime("%d/%m/%Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria Fed", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=1)).strftime("%d/%m/%Y"), "Evento": "Publicación del Índice de Precios al Consumidor (IPC)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=2)).strftime("%d/%m/%Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=3)).strftime("%d/%m/%Y"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
-        ]
-    return eventos
 # --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
     "📊 Terminal de Mercado", 
@@ -353,13 +292,6 @@ tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
-    
-    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE ANTES DEL TÍTULO
-    mostrar_logo(st, width=160)
-    
-    st.title("📊 Market Radar Quant Terminal")
-    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
-
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
 
@@ -392,30 +324,29 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (DINÁMICO EN VIVO)
-    st.header("2. 📊 Datos Económicos Relevantes de la Semana")
-    st.caption("🗓️ **Feed Macroeconómico Global en Tiempo Real**")
+    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (WIDGET EN TIEMPO REAL)
+    st.header("2. 📊 Calendario Económico Global")
+    st.caption("🗓️ **Eventos Macro en Tiempo Real (Actualización Automática y Precisa)**")
 
-    cal_eventos_live = obtener_calendario_economico_dinamico()
-    
-    col_cal_a, col_cal_b = st.columns([1, 2])
-    with col_cal_a:
-        filtro_imp = st.multiselect("Relevancia", ["🔴 Alto Impacto", "🟡 Impacto Medio"], default=["🔴 Alto Impacto", "🟡 Impacto Medio"])
-    
-    with col_cal_b:
-        for ev in cal_eventos_live:
-            if not filtro_imp or ev["Impacto"] in filtro_imp:
-                st.markdown(f"""
-                <div class="cal-card-v2">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8b949e;">
-                        <span>⏰ <b>{ev['Fecha']}</b></span>
-                        <span style="color: {'#f85149' if '🔴' in ev['Impacto'] else '#d29922'}; font-weight: bold;">{ev['Impacto']}</span>
-                    </div>
-                    <div style="font-size: 14px; font-weight: bold; color: #f0f6fc; margin-top: 5px;">
-                        <a href="{ev['Link']}" target="_blank" style="color: #f0f6fc; text-decoration: none;">{ev['Evento']} 🔗</a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
+    widget_calendario_tv = """
+    <!-- TradingView Widget BEGIN -->
+    <div class="tradingview-widget-container">
+      <div class="tradingview-widget-container__widget"></div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
+      {
+      "colorTheme": "dark",
+      "isTransparent": true,
+      "width": "100%",
+      "height": "400",
+      "locale": "es",
+      "importanceFilter": "-1,0,1",
+      "currencyFilter": "USD,EUR,GBP,JPY,AUD,CAD,CHF,CNY"
+      }
+      </script>
+    </div>
+    <!-- TradingView Widget END -->
+    """
+    st.components.v1.html(widget_calendario_tv, height=420)
 
     # MÓDULO 3: MICHAEL VIRTUAL — TESIS FLUIDA & RADAR CISNE NEGRO LIMPIO
     st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
@@ -510,7 +441,7 @@ with tab_terminal:
                 st.markdown("- **Distribución Silenciosa:** Narrativas optimistas mediáticas mientras el *Smart Money* rota capital silenciosamente.")
                 
                 st.divider()
-                st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales con apalancamiento acotado.")
+                st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales controlando el lotaje.")
 
     # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP (SIMPLIFICADA A LOTAJE)
     st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
@@ -520,9 +451,9 @@ with tab_terminal:
         piso = st.slider("Distancia Estimada al Suelo Anual (%)", 1.0, 30.0, 10.0)
         pips_piso = st.number_input("Pips / Puntos al Piso Anual", value=250, step=10)
         dias_operados = st.number_input("Días Estimados de Posición (Overnight)", value=5, min_value=1, step=1)
-        direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
-
+        
     with c2:
+        direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
         lotes_manuales = st.number_input("Tamaño de Posición Personalizado (Lotes)", value=1.0, min_value=0.01, max_value=100.0, step=0.1)
         
         nocional_lotes = lotes_manuales * 100000
@@ -539,7 +470,7 @@ with tab_terminal:
 
     st.markdown(f"""
     <div class="quant-card">
-        <h4>📊 Métricas de Control de Riesgo, Lotaje y Costos Swap</h4>
+        <h4>📊 Métricas de Control de Riesgo y Costos Swap</h4>
         <p><b>Capital Cuenta:</b> ${cap:,.2f} USD</p>
         <p><b>Volumen Real Operado ({lotes_manuales} Lote/s):</b> ${nocional_lotes:,.2f} USD Nocionales</p>
         <p><b>Dimensionamiento Sugerido por Riesgo al Piso ({piso}%):</b> <code>{lote_sugerido:.2f} Lotes</code></p>
@@ -643,7 +574,7 @@ with tab_guia:
 
     <div class="quant-card">
     <h4>Step 4: Dimensionamiento de Posición y Cálculo de Swap Overnight</h4>
-    <p>Utiliza la <b>Calculadora de Riesgo</b> introduciendo tu capital real, el apalancamiento que vas a usar y los días que mantendrás la posición abierta. Comprueba el <b>Costo Swap Neto</b> para asegurarte de que las comisiones por mantener la operación durante la noche no comprometan tu cuenta.</p>
+    <p>Utiliza la <b>Calculadora de Riesgo</b> introduciendo tu capital real, el lotaje que vas a usar y los días que mantendrás la posición abierta. Comprueba el <b>Costo Swap Neto</b> para asegurarte de que las comisiones por mantener la operación durante la noche no comprometan tu cuenta.</p>
     </div>
     """, unsafe_allow_html=True)
 
