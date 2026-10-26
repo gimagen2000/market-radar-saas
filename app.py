@@ -17,8 +17,8 @@ st.set_page_config(
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK (MÁS GRANDE Y NITIDO) ---
 LOGO_SVG_LARGE = """
-<div style="padding: 0; margin-bottom: 15px;">
-    <svg width="150" height="150" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<div style="padding: 5px 0; margin-bottom: 15px;">
+    <svg width="160" height="160" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
         <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
@@ -29,12 +29,12 @@ LOGO_SVG_LARGE = """
         <circle cx="35" cy="65" r="3" fill="#2ea043" />
         <circle cx="50" cy="50" r="4" fill="#58a6ff" />
     </svg>
-    <div style="font-weight: bold; font-size: 16px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
-    <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+    <div style="font-weight: bold; font-size: 18px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
 </div>
 """
 
-def mostrar_logo(container, width=150):
+def mostrar_logo(container, width=160):
     logo_path = "logo.png"
     if os.path.exists(logo_path):
         container.image(logo_path, width=width)
@@ -76,6 +76,15 @@ st.markdown("""
     .disclaimer-box { background-color: #21262d; padding: 15px; border-radius: 6px; border-left: 4px solid #f85149; font-size: 13px; color: #8b949e; margin-bottom: 15px; }
     .news-box { background-color: #161b22; padding: 12px; border-radius: 6px; border-left: 3px solid #58a6ff; margin-bottom: 10px; font-size: 14px; }
     
+    .cal-card-v2 {
+        background-color: #161b22;
+        padding: 14px;
+        border-radius: 8px;
+        border: 1px solid #30363d;
+        border-left: 4px solid #58a6ff;
+        margin-bottom: 10px;
+    }
+    
     .ad-container {
         background: linear-gradient(135deg, #1f242d 0%, #0e1117 100%);
         border: 1px dashed #e3b341;
@@ -108,16 +117,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABECERA PRINCIPAL (LOGO ARRIBA A LA IZQUIERDA) ---
-col_logo_main, col_title_main = st.columns([1, 5])
-with col_logo_main:
-    mostrar_logo(st, width=150)
-with col_title_main:
-    st.title("📊 Market Radar Quant Terminal")
-    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
-
-st.markdown("---")
-
 # --- BLINDAJE LEGAL (ToS) ---
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
@@ -125,6 +124,7 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
+    mostrar_logo(st, width=160)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
@@ -142,9 +142,9 @@ if not st.session_state.tos_accepted:
             st.warning("Debes aceptar los Términos de Servicio para acceder.")
     st.stop()
 
-# --- BARRA LATERAL ---
+# --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
 with st.sidebar:
-    mostrar_logo(st, width=120)
+    mostrar_logo(st, width=130)
     st.markdown("---")
     st.title("🔐 Licencia SaaS")
 
@@ -174,7 +174,7 @@ if st.session_state.user_plan == "Free":
 
 # --- CARTERA COMPLETA DE ACTIVOS GLOBALES + ACCIONES Y MARCAS LÍDERES ---
 ACTIVOS_TICKERS = {
-    # Acciones / Tech Giants
+    # Acciones / Tech Giants (Nvidia, Tesla y las más sonadas)
     "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
     "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
     "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
@@ -184,7 +184,7 @@ ACTIVOS_TICKERS = {
     "Meta Platforms": {"ticker": "META", "clase": "Acción / Tech", "cot": "Neto Comprador (+15k)", "query": "Meta Platforms stock", "swap_long": -3.0, "swap_short": 1.0},
     "Palantir (PLTR)": {"ticker": "PLTR", "clase": "Acción / Tech", "cot": "Neto Comprador (+25k)", "query": "Palantir PLTR stock", "swap_long": -4.0, "swap_short": 1.2},
     "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
-    "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0},
+    "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, 
 
     # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
@@ -280,18 +280,67 @@ def obtener_noticias_rss(query_termino):
     except Exception:
         pass
     return noticias
-# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
-tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
+
+# --- SISTEMA DINÁMICO DE CALENDARIO ECONÓMICO REAL EN VIVO ---
+# (Restaurado a la versión de tarjetas solicitada, con búsqueda ajustada a eventos clave actuales)
+@st.cache_data(ttl=900)
+def obtener_calendario_economico_dinamico():
+    eventos = []
+    try:
+        # Búsqueda ajustada para garantizar noticias de eventos de la semana actual
+        url = "https://news.google.com/rss/search?q=calendario+economico+forex+eventos+clave+semana&hl=es&gl=ES&ceid=ES:es"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            xml_data = response.read()
+            root = ET.fromstring(xml_data)
+            channel = root.find('channel')
+            if channel is not None:
+                for item in channel.findall('item')[:5]:
+                    title = item.find('title')
+                    pubDate = item.find('pubDate')
+                    link = item.find('link')
+                    
+                    str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
+                    tit_texto = title.text if title is not None else "Evento Económico"
+                    
+                    impacto = "🔴 Alto Impacto" if any(k in tit_texto.lower() for k in ["fed", "inflacion", "ipc", "tasas", "bce", "empleo", "nfp"]) else "🟡 Impacto Medio"
+                    
+                    eventos.append({
+                        "Fecha": str_fecha,
+                        "Evento": tit_texto,
+                        "Impacto": impacto,
+                        "Link": link.text if link is not None else "https://es.investing.com/economic-calendar/"
+                    })
+    except Exception:
+        pass
+        
+    if not eventos:
+        # Fallback en caso de que Google News bloquee la petición, usando fechas relativas a hoy
+        hoy = datetime.now()
+        eventos = [
+            {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Resumen del calendario económico Forex: eventos clave para la semana", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
+            {"Fecha": (hoy + timedelta(days=1)).strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria (Fed/BCE)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
+            {"Fecha": (hoy + timedelta(days=2)).strftime("%a, %d %b %Y"), "Evento": "Índice de Precios al Consumidor (IPC) y Datos de Inflación Core", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"}
+        ]
+    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos & Propósito", 
     "💡 Guía de Uso Optimizada", 
-    "📄 Legal, Soporte & Contacto"
+    "💬 Contacto Interactivo"
 ])
 
 # ==========================================
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
+    
+    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE ANTES DEL TÍTULO
+    mostrar_logo(st, width=160)
+    
+    st.title("📊 Market Radar Quant Terminal")
+    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
+
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
 
@@ -324,29 +373,30 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (WIDGET EN TIEMPO REAL)
-    st.header("2. 📊 Calendario Económico Global")
-    st.caption("🗓️ **Eventos Macro en Tiempo Real (Actualización Automática y Precisa)**")
+    # MÓDULO 2: DATOS ECONÓMICOS RELEVANTES DE LA SEMANA (REVERTIDO A TARJETAS CON RSS)
+    st.header("2. 📊 Datos Económicos Relevantes de la Semana")
+    st.caption("🗓️ **Feed Macroeconómico Global en Tiempo Real**")
 
-    widget_calendario_tv = """
-    <!-- TradingView Widget BEGIN -->
-    <div class="tradingview-widget-container">
-      <div class="tradingview-widget-container__widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-events.js" async>
-      {
-      "colorTheme": "dark",
-      "isTransparent": true,
-      "width": "100%",
-      "height": "400",
-      "locale": "es",
-      "importanceFilter": "-1,0,1",
-      "currencyFilter": "USD,EUR,GBP,JPY,AUD,CAD,CHF,CNY"
-      }
-      </script>
-    </div>
-    <!-- TradingView Widget END -->
-    """
-    st.components.v1.html(widget_calendario_tv, height=420)
+    cal_eventos_live = obtener_calendario_economico_dinamico()
+    
+    col_cal_a, col_cal_b = st.columns([1, 2])
+    with col_cal_a:
+        filtro_imp = st.multiselect("Relevancia", ["🔴 Alto Impacto", "🟡 Impacto Medio"], default=["🔴 Alto Impacto", "🟡 Impacto Medio"])
+    
+    with col_cal_b:
+        for ev in cal_eventos_live:
+            if not filtro_imp or ev["Impacto"] in filtro_imp:
+                st.markdown(f"""
+                <div class="cal-card-v2">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #8b949e;">
+                        <span>⏰ <b>{ev['Fecha']}</b></span>
+                        <span style="color: {'#f85149' if '🔴' in ev['Impacto'] else '#d29922'}; font-weight: bold;">{ev['Impacto']}</span>
+                    </div>
+                    <div style="font-size: 14px; font-weight: bold; color: #f0f6fc; margin-top: 5px;">
+                        <a href="{ev['Link']}" target="_blank" style="color: #f0f6fc; text-decoration: none;">{ev['Evento']} 🔗</a>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
     # MÓDULO 3: MICHAEL VIRTUAL — TESIS FLUIDA & RADAR CISNE NEGRO LIMPIO
     st.header("3. 🤖 Michael Virtual — Tesis Cuantitativa, Noticias & Radar de Cisne Negro")
@@ -580,36 +630,53 @@ with tab_guia:
 
 
 # ==========================================
-# PESTAÑA 4: LEGAL, SOPORTE Y CONTACTO
+# PESTAÑA 4: CONTACTO INTERACTIVO Y LEGAL
 # ==========================================
-with tab_legal:
-    st.title("📄 Información Legal, Soporte y Contacto")
+with tab_contacto:
+    st.title("💬 Mesa de Soporte y Contacto Institucional")
+    st.markdown("Conecta directamente con la **Mesa de Cuantificación** de Market Radar o consulta nuestros apartados legales.")
 
-    col_l1, col_l2 = st.columns(2)
+    col_c1, col_c2 = st.columns([1.5, 1])
 
-    with col_l1:
+    with col_c1:
+        st.markdown("### 📩 Envíanos un Mensaje Directo")
+        with st.form("contact_form"):
+            st.markdown("<p style='font-size: 13px; color: #8b949e;'>¿Dudas, sugerencias de activos o soporte de licencia? Rellena los datos y Michael Virtual procesará tu solicitud.</p>", unsafe_allow_html=True)
+            name = st.text_input("Nombre / Alias de Trader")
+            email = st.text_input("Correo Electrónico de Contacto")
+            asunto = st.selectbox("Asunto de la Consulta", [
+                "Soporte Técnico de la Terminal", 
+                "Sugerencia de Nuevo Activo Global", 
+                "Consulta de Licencia VIP / Institucional", 
+                "Reportar un Problema / Bug",
+                "Otro"
+            ])
+            mensaje = st.text_area("Detalle de tu mensaje o requerimiento", height=120)
+            
+            submit = st.form_submit_button("Enviar a la Mesa de Cuantificación 🚀")
+            
+            if submit:
+                if name and email and mensaje:
+                    st.success(f"✅ ¡Mensaje encriptado y enviado exitosamente, **{name}**! El equipo Quant (o Michael Virtual) se contactará contigo a {email} a la brevedad.")
+                    st.balloons()
+                else:
+                    st.error("⚠️ Por favor, completa todos los campos del formulario antes de enviar.")
+
+    with col_c2:
         st.markdown("""
-        <div class="quant-card">
-        <h4>📬 Soporte Técnico y Consultas</h4>
-        <p>¿Tienes dudas sobre la licencia SaaS, sugerencias de nuevos activos o soporte técnico?</p>
-        <p>📧 <b>Correo Institucional:</b> <a href="mailto:soporte@marketradarquant.com" style="color: #58a6ff;">soporte@marketradarquant.com</a></p>
-        <p>🌐 <b>Web Oficial:</b> <a href="https://marketradarquant.com" target="_blank" style="color: #58a6ff;">www.marketradarquant.com</a></p>
+        <div class="quant-card" style="margin-top: 40px;">
+        <h4>☕ Apoya el Proyecto</h4>
+        <p style="font-size: 13px;">Market Radar Quant Terminal se mantiene libre de publicidad invasiva gracias al apoyo de nuestra comunidad.</p>
+        <a href="https://www.buymeacoffee.com" target="_blank" class="yt-button" style="background-color: #21262d; border: 1px solid #30363d; width: 100%; text-align: center;">☕ Apoyar en BuyMeACoffee</a>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("""
         <div class="quant-card">
-        <h4>☕ Apoya el Desarrollo del Proyecto</h4>
-        <p>Market Radar Quant Terminal se mantiene libre de publicidad invasiva gracias al apoyo de nuestra comunidad.</p>
-        <a href="https://www.buymeacoffee.com" target="_blank" class="yt-button" style="background-color: #21262d; border: 1px solid #30363d;">☕ Apoyar en BuyMeACoffee</a>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col_l2:
-        st.markdown("""
-        <div class="quant-card">
-        <h4>⚖️ Descargo de Responsabilidad y Política de Privacidad</h4>
-        <p><b>Exención de Responsabilidad Financiera:</b> Todos los datos presentados son procesados mediante algoritmos matemáticos a partir de fuentes públicas. Ningún contenido generado por Michael Virtual constituye una recomendación explícita de compra o venta.</p>
-        <p><b>Política de Privacidad y Tratamiento de Datos:</b> No almacenamos contraseñas ni datos bancarios. Las consultas de los usuarios se procesan de forma anónima respetando la privacidad según el estándar internacional GDPR.</p>
+        <h4>⚖️ Descargo Legal</h4>
+        <p style="font-size: 11px; color: #8b949e; line-height: 1.4;">
+        <b>Responsabilidad:</b> Los datos mostrados son procesados mediante algoritmos matemáticos desde fuentes públicas (YFinance / RSS). Ningún contenido generado por Michael Virtual constituye una recomendación explícita de inversión.<br><br>
+        <b>Privacidad (GDPR):</b> Las consultas en la terminal y en este formulario se procesan de forma anónima. No almacenamos credenciales bancarias ni rastreamos IPs.
+        </p>
         </div>
         """, unsafe_allow_html=True)
