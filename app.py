@@ -15,10 +15,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- LOGOTIPO SVG NATIVO / FALLBACK ---
-LOGO_SVG = """
-<div style="text-align: center; padding: 10px 0;">
-    <svg width="70" height="70" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+# --- LOGOTIPO SVG NATIVO / FALLBACK (MÁS GRANDE Y NITIDO) ---
+LOGO_SVG_LARGE = """
+<div style="padding: 5px 0;">
+    <svg width="110" height="110" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
         <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
@@ -29,17 +29,17 @@ LOGO_SVG = """
         <circle cx="35" cy="65" r="3" fill="#2ea043" />
         <circle cx="50" cy="50" r="4" fill="#58a6ff" />
     </svg>
-    <div style="font-weight: bold; font-size: 16px; color: #f0f6fc; margin-top: 5px; letter-spacing: 1px;">MARKET RADAR</div>
-    <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+    <div style="font-weight: bold; font-size: 14px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 9px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
 </div>
 """
 
-def mostrar_logo(container, width=120):
+def mostrar_logo(container, width=130):
     logo_path = "logo.png"
     if os.path.exists(logo_path):
         container.image(logo_path, width=width)
     else:
-        container.markdown(LOGO_SVG, unsafe_allow_html=True)
+        container.markdown(LOGO_SVG_LARGE, unsafe_allow_html=True)
 
 # --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
 ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"  # Reemplaza con tu Client ID real
@@ -67,7 +67,7 @@ def render_adsense(client_id, slot_id, height=100):
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
 
-# --- ESTILOS CSS PROFESIONALES REFINADOS ---
+# --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
     .main { background-color: #0e1117; color: #c9d1d9; }
@@ -124,11 +124,11 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
-    mostrar_logo(st)
+    mostrar_logo(st, width=130)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
-    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter strictly educativo, informativo y de investigación. 
+    <b>AVISO LEGAL OBLIGATORIO:</b> Market Radar Quant Terminal es una plataforma de software estadístico, procesamiento de datos públicos y análisis cuantitativo de carácter estrictamente educativo, informativo y de investigación. 
     Esta herramienta <b>no constituye asesoramiento financiero, gestión de capital ni recomendación de inversión</b>.
     </div>
     """, unsafe_allow_html=True)
@@ -144,7 +144,7 @@ if not st.session_state.tos_accepted:
 
 # --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
 with st.sidebar:
-    mostrar_logo(st, width=100)
+    mostrar_logo(st, width=110)
     st.markdown("---")
     st.title("🔐 Licencia SaaS")
 
@@ -172,8 +172,20 @@ if st.session_state.user_plan == "Free":
     with st.sidebar:
         render_adsense(ADSENSE_CLIENT_ID, ADSENSE_SLOT_ID, height=150)
 
-# --- CARTERA COMPLETA DE ACTIVOS GLOBALES ---
+# --- CARTERA COMPLETA DE ACTIVOS GLOBALES + ACCIONES Y MARCAS LÍDERES ---
 ACTIVOS_TICKERS = {
+    # Acciones / Tech Giants (Nvidia, Tesla y las más sonadas)
+    "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
+    "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
+    "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
+    "Microsoft (MSFT)": {"ticker": "MSFT", "clase": "Acción / Tech", "cot": "Neto Comprador (+20k)", "query": "Microsoft MSFT acciones", "swap_long": -2.5, "swap_short": 0.8},
+    "Amazon (AMZN)": {"ticker": "AMZN", "clase": "Acción / Tech", "cot": "Neutral", "query": "Amazon AMZN stock", "swap_long": -2.7, "swap_short": 0.9},
+    "Alphabet / Google": {"ticker": "GOOGL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Google Alphabet stock", "swap_long": -2.4, "swap_short": 0.8},
+    "Meta Platforms": {"ticker": "META", "clase": "Acción / Tech", "cot": "Neto Comprador (+15k)", "query": "Meta Platforms stock", "swap_long": -3.0, "swap_short": 1.0},
+    "Palantir (PLTR)": {"ticker": "PLTR", "clase": "Acción / Tech", "cot": "Neto Comprador (+25k)", "query": "Palantir PLTR stock", "swap_long": -4.0, "swap_short": 1.2},
+    "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
+    "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, # Nota: Referencia de seguimiento analítico vía Tesla / sector espacial
+
     # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
@@ -325,10 +337,11 @@ def obtener_calendario_economico_dinamico():
         eventos = [
             {"Fecha": hoy.strftime("%d/%m/%Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria Fed", "Impacto": "🔴 Alto Impacto", "Link": "#"},
             {"Fecha": (hoy + timedelta(days=1)).strftime("%d/%m/%Y"), "Evento": "Publicación del Índice de Precios al Consumidor (IPC)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=2)).strftime("%d/%m/%Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=3)).strftime("%d/%m/%Y"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
+            {"Fecha": (hoy + timedelta(days=2)).strftime("%Y-%m-%d"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
+            {"Fecha": (hoy + timedelta(days=3)).strftime("%Y-%m-%d"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
         ]
-    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    return eventos
+# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos & Propósito", 
@@ -340,12 +353,13 @@ tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
-    col_head1, col_head2 = st.columns([4, 1.2])
-    with col_head1:
+    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE
+    col_logo_top, col_title_top = st.columns([1.2, 5])
+    with col_logo_top:
+        mostrar_logo(st, width=130)
+    with col_title_top:
         st.title("📊 Market Radar Quant Terminal")
         st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
-    with col_head2:
-        mostrar_logo(st, width=110)
 
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
