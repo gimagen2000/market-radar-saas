@@ -17,8 +17,8 @@ st.set_page_config(
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK (MÁS GRANDE Y NITIDO) ---
 LOGO_SVG_LARGE = """
-<div style="padding: 5px 0;">
-    <svg width="110" height="110" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<div style="padding: 5px 0; margin-bottom: 15px;">
+    <svg width="160" height="160" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#58a6ff" stroke-width="3" fill="#161b22" />
         <circle cx="50" cy="50" r="30" stroke="#30363d" stroke-width="2" fill="none" />
         <circle cx="50" cy="50" r="15" stroke="#30363d" stroke-width="2" fill="none" />
@@ -29,12 +29,12 @@ LOGO_SVG_LARGE = """
         <circle cx="35" cy="65" r="3" fill="#2ea043" />
         <circle cx="50" cy="50" r="4" fill="#58a6ff" />
     </svg>
-    <div style="font-weight: bold; font-size: 14px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
-    <div style="font-size: 9px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
+    <div style="font-weight: bold; font-size: 18px; color: #f0f6fc; margin-top: 4px; letter-spacing: 1px;">MARKET RADAR</div>
+    <div style="font-size: 11px; color: #8b949e; text-transform: uppercase;">Quant Terminal</div>
 </div>
 """
 
-def mostrar_logo(container, width=130):
+def mostrar_logo(container, width=160):
     logo_path = "logo.png"
     if os.path.exists(logo_path):
         container.image(logo_path, width=width)
@@ -124,7 +124,7 @@ if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
 if not st.session_state.tos_accepted:
-    mostrar_logo(st, width=130)
+    mostrar_logo(st, width=160)
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
     <div class="disclaimer-box">
@@ -144,7 +144,7 @@ if not st.session_state.tos_accepted:
 
 # --- BARRA LATERAL CON LOGO Y MONETIZACIÓN ---
 with st.sidebar:
-    mostrar_logo(st, width=110)
+    mostrar_logo(st, width=130)
     st.markdown("---")
     st.title("🔐 Licencia SaaS")
 
@@ -230,117 +230,7 @@ ACTIVOS_TICKERS = {
     "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado", "swap_long": -0.6, "swap_short": -0.3},
     "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
     "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
-    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
-    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
-
-    # Criptomonedas
-    "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
-    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
-}
-
-@st.cache_data(ttl=300)
-def obtener_datos_mercado_real():
-    filas = []
-    for nombre, info in ACTIVOS_TICKERS.items():
-        try:
-            ticker_obj = yf.Ticker(info["ticker"])
-            hist = ticker_obj.history(period="1y")
-            if not hist.empty:
-                precio_actual = hist["Close"].iloc[-1]
-                min_52w = hist["Low"].min()
-                max_52w = hist["High"].max()
-                
-                percentil_1y = ((precio_actual - min_52w) / (max_52w - min_52w)) * 100 if max_52w > min_52w else 50.0
-
-                hist_3m = hist.tail(63)
-                min_3m = hist_3m["Low"].min()
-                max_3m = hist_3m["High"].max()
-                percentil_3m = ((precio_actual - min_3m) / (max_3m - min_3m)) * 100 if max_3m > min_3m else 50.0
-
-                estado = "Desviación Baja (≤20%) - Sesgo Comprador" if percentil_1y <= 20 else ("Sobrecompra" if percentil_1y >= 80 else "Rango Medio")
-
-                filas.append({
-                    "Activo": nombre,
-                    "Clase": info["clase"],
-                    "Precio Actual": round(precio_actual, 4),
-                    "Mín 52 Sem": round(min_52w, 4),
-                    "Máx 52 Sem": round(max_52w, 4),
-                    "Percentil 1Y (%)": round(percentil_1y, 1),
-                    "Percentil 3M (%)": round(percentil_3m, 1),
-                    "Estructura Estadística": estado,
-                    "Flujo COT (Institucional)": info["cot"],
-                    "Swap Long ($/lote)": info["swap_long"],
-                    "Swap Short ($/lote)": info["swap_short"]
-                })
-        except Exception:
-            pass
-    return pd.DataFrame(filas)
-
-def obtener_noticias_rss(query_termino):
-    noticias = []
-    try:
-        query_encoded = urllib.parse.quote(query_termino)
-        url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=4) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            channel = root.find('channel')
-            if channel is not None:
-                for item in channel.findall('item')[:3]:
-                    title = item.find('title')
-                    link = item.find('link')
-                    source = item.find('source')
-                    
-                    noticias.append({
-                        "title": title.text if title is not None else "Sin título",
-                        "link": link.text if link is not None else "#",
-                        "publisher": source.text if source is not None else "Finanzas"
-                    })
-    except Exception:
-        pass
-    return noticias
-
-# --- SISTEMA DINÁMICO DE CALENDARIO ECONÓMICO REAL EN VIVO ---
-@st.cache_data(ttl=900)
-def obtener_calendario_economico_dinamico():
-    eventos = []
-    try:
-        url = "https://news.google.com/rss/search?q=calendario+economico+fed+bce+ipc+inflacion&hl=es&gl=ES&ceid=ES:es"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            channel = root.find('channel')
-            if channel is not None:
-                for item in channel.findall('item')[:6]:
-                    title = item.find('title')
-                    pubDate = item.find('pubDate')
-                    link = item.find('link')
-                    
-                    str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
-                    tit_texto = title.text if title is not None else "Evento Económico"
-                    
-                    impacto = "🔴 Alto Impacto" if any(k in tit_texto.lower() for k in ["fed", "inflacion", "ipc", "tasas", "bce", "empleo"]) else "🟡 Impacto Medio"
-                    
-                    eventos.append({
-                        "Fecha": str_fecha,
-                        "Evento": tit_texto,
-                        "Impacto": impacto,
-                        "Link": link.text if link is not None else "#"
-                    })
-    except Exception:
-        pass
-        
-    if not eventos:
-        hoy = datetime.now()
-        eventos = [
-            {"Fecha": hoy.strftime("%d/%m/%Y"), "Evento": "Decisión de Tasas de Interés y Política Monetaria Fed", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=1)).strftime("%d/%m/%Y"), "Evento": "Publicación del Índice de Precios al Consumidor (IPC)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=2)).strftime("%Y-%m-%d"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "#"},
-            {"Fecha": (hoy + timedelta(days=3)).strftime("%Y-%m-%d"), "Evento": "PMI Manufacturero e Industrial de la Eurozona", "Impacto": "🟡 Impacto Medio", "Link": "#"}
-        ]
-    return eventos
+    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.
 # --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
     "📊 Terminal de Mercado", 
@@ -353,13 +243,12 @@ tab_terminal, tab_nosotros, tab_guia, tab_legal = st.tabs([
 # PESTAÑA 1: TERMINAL DE MERCADO
 # ==========================================
 with tab_terminal:
-    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE
-    col_logo_top, col_title_top = st.columns([1.2, 5])
-    with col_logo_top:
-        mostrar_logo(st, width=130)
-    with col_title_top:
-        st.title("📊 Market Radar Quant Terminal")
-        st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
+    
+    # LOGOTIPO ARRIBA A LA IZQUIERDA Y MÁS GRANDE ANTES DEL TÍTULO
+    mostrar_logo(st, width=160)
+    
+    st.title("📊 Market Radar Quant Terminal")
+    st.markdown("### Procesamiento Estadístico de Mercados, Cartera Global Ampliada y Noticias en Vivo")
 
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
@@ -511,9 +400,9 @@ with tab_terminal:
                 st.markdown("- **Distribución Silenciosa:** Narrativas optimistas mediáticas mientras el *Smart Money* rota capital silenciosamente.")
                 
                 st.divider()
-                st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales con apalancamiento acotado (<1:10).")
+                st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales con apalancamiento acotado.")
 
-    # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP
+    # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP (SIMPLIFICADA A LOTAJE)
     st.header("4. Calculadora de Exposición, Lotaje y Costos Swap (Overnight)")
     c1, c2 = st.columns(2)
     with c1:
@@ -524,10 +413,8 @@ with tab_terminal:
         direccion_pos = st.radio("Dirección de la Operación", ["Comprado (Long)", "Vendido (Short)"])
 
     with c2:
-        apalanque = st.selectbox("Apalancamiento Operativo", [1, 2, 5, 10, 20, 30, 50, 100], index=2)
         lotes_manuales = st.number_input("Tamaño de Posición Personalizado (Lotes)", value=1.0, min_value=0.01, max_value=100.0, step=0.1)
         
-        expo_teorica = cap * apalanque
         nocional_lotes = lotes_manuales * 100000
         riesgo = cap * (piso / 100.0)
         lote_sugerido = (riesgo / (pips_piso * 10)) if pips_piso > 0 else 0.01
@@ -542,9 +429,8 @@ with tab_terminal:
 
     st.markdown(f"""
     <div class="quant-card">
-        <h4>📊 Métricas de Control de Riesgo, Lotaje y Apalancamiento</h4>
-        <p><b>Capital Cuenta:</b> ${cap:,.2f} USD | <b>Apalancamiento Seleccionado:</b> 1:{apalanque}</p>
-        <p><b>Exposición Teórica con Apalancamiento:</b> ${expo_teorica:,.2f} USD</p>
+        <h4>📊 Métricas de Control de Riesgo, Lotaje y Costos Swap</h4>
+        <p><b>Capital Cuenta:</b> ${cap:,.2f} USD</p>
         <p><b>Volumen Real Operado ({lotes_manuales} Lote/s):</b> ${nocional_lotes:,.2f} USD Nocionales</p>
         <p><b>Dimensionamiento Sugerido por Riesgo al Piso ({piso}%):</b> <code>{lote_sugerido:.2f} Lotes</code></p>
         <hr style="border: 0.5px solid #30363d;">
