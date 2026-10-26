@@ -63,6 +63,28 @@ def mostrar_binance_pay(container):
         container.warning("⚠️ Guarda tu imagen del QR de Binance como 'qr_binance.png' en esta carpeta para que se muestre aquí.")
     container.markdown("<p style='font-size: 11px; color: #3fb950; font-weight: bold;'>Red Binance Pay — Cero comisiones</p>", unsafe_allow_html=True)
 
+# --- CONFIGURACIÓN DE GOOGLE ADSENSE ---
+ADSENSE_CLIENT_ID = "ca-pub-XXXXXXXXXXXXXXXX"
+ADSENSE_SLOT_ID = "YYYYYYYYYY"
+
+def render_adsense(client_id, slot_id, height=100):
+    adsense_code = f"""
+    <div style="text-align: center;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={client_id}"
+             crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="{client_id}"
+             data-ad-slot="{slot_id}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({{}});
+        </script>
+    </div>
+    """
+    st.components.v1.html(adsense_code, height=height)
+
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
@@ -137,8 +159,9 @@ if st.session_state.user_plan == "Free":
     </div>
     """, unsafe_allow_html=True)
     
-# --- CARTERA COMPLETA DE ACTIVOS GLOBALES + ACCIONES Y MARCAS LÍDERES ---
+# --- CARTERA COMPLETA DE ACTIVOS GLOBALES (FUSIÓN TOTAL) ---
 ACTIVOS_TICKERS = {
+    # Acciones / Tech Giants
     "Nvidia (NVDA)": {"ticker": "NVDA", "clase": "Acción / Tech", "cot": "Neto Comprador (+45k)", "query": "Nvidia NVDA stock noticias", "swap_long": -4.5, "swap_short": 1.5},
     "Tesla (TSLA)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neto Comprador (+18k)", "query": "Tesla TSLA acciones", "swap_long": -3.8, "swap_short": 1.1},
     "Apple (AAPL)": {"ticker": "AAPL", "clase": "Acción / Tech", "cot": "Neutral", "query": "Apple AAPL stock", "swap_long": -2.2, "swap_short": 0.7},
@@ -150,6 +173,7 @@ ACTIVOS_TICKERS = {
     "AMD": {"ticker": "AMD", "clase": "Acción / Tech", "cot": "Neutral", "query": "AMD stock noticias", "swap_long": -3.2, "swap_short": 1.0},
     "SpaceX (Noticias)": {"ticker": "TSLA", "clase": "Acción / Tech", "cot": "Neutral", "query": "SpaceX Starship lanzamientos noticias", "swap_long": -3.0, "swap_short": 1.0}, 
 
+    # Forex Majors
     "EUR/USD": {"ticker": "EURUSD=X", "clase": "Forex", "cot": "Neto Comprador (+14k)", "query": "EUR USD tipo de cambio forex", "swap_long": -3.5, "swap_short": 1.2},
     "GBP/USD": {"ticker": "GBPUSD=X", "clase": "Forex", "cot": "Neto Comprador (+8k)", "query": "GBP USD libra esterlina", "swap_long": -2.8, "swap_short": 0.9},
     "USD/JPY": {"ticker": "JPY=X", "clase": "Forex", "cot": "Neto Vendedor (-12k)", "query": "USD JPY yen japones", "swap_long": 4.2, "swap_short": -6.5},
@@ -157,108 +181,48 @@ ACTIVOS_TICKERS = {
     "USD/CAD": {"ticker": "USDCAD=X", "clase": "Forex", "cot": "Neto Vendedor (-4k)", "query": "USD CAD dollar canadiense", "swap_long": 0.5, "swap_short": -2.1},
     "NZD/USD": {"ticker": "NZDUSD=X", "clase": "Forex", "cot": "Neutral", "query": "NZD USD new zealand dollar", "swap_long": -1.2, "swap_short": -0.8},
     "USD/CHF": {"ticker": "USDCHF=X", "clase": "Forex", "cot": "Neutral", "query": "USD CHF franco suizo", "swap_long": 2.1, "swap_short": -4.0},
+
+    # Forex Minors / Cruces (Restaurados)
+    "EUR/GBP": {"ticker": "EURGBP=X", "clase": "Forex", "cot": "Neutral", "query": "EUR GBP euro libra", "swap_long": -2.1, "swap_short": 0.4},
+    "EUR/JPY": {"ticker": "EURJPY=X", "clase": "Forex", "cot": "Neto Comprador (+10k)", "query": "EUR JPY euro yen", "swap_long": 3.8, "swap_short": -5.9},
+    "GBP/JPY": {"ticker": "GBPJPY=X", "clase": "Forex", "cot": "Neto Comprador (+6k)", "query": "GBP JPY libra yen", "swap_long": 5.1, "swap_short": -7.2},
+    "AUD/JPY": {"ticker": "AUDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "AUD JPY australiano yen", "swap_long": 2.5, "swap_short": -4.1},
+    "NZD/JPY": {"ticker": "NZDJPY=X", "clase": "Forex", "cot": "Neutral", "query": "NZD JPY neozelandes yen", "swap_long": 2.2, "swap_short": -3.8},
+    "CAD/JPY": {"ticker": "CADJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CAD JPY canadiense yen", "swap_long": 3.0, "swap_short": -4.9},
+    "CHF/JPY": {"ticker": "CHFJPY=X", "clase": "Forex", "cot": "Neutral", "query": "CHF JPY franco yen", "swap_long": 1.8, "swap_short": -3.5},
+
+    # Forex Emergentes & LATAM
     "USD/CLP": {"ticker": "USDCLP=X", "clase": "Forex", "cot": "Neto Comprador (+3k)", "query": "USD CLP dolar peso chileno", "swap_long": 8.5, "swap_short": -11.2},
     "USD/MXN": {"ticker": "USDMXN=X", "clase": "Forex", "cot": "Neto Vendedor (-5k)", "query": "USD MXN dolar peso mexicano", "swap_long": 12.0, "swap_short": -16.5},
+    "USD/BRL": {"ticker": "USDBRL=X", "clase": "Forex", "cot": "Neutral", "query": "USD BRL dolar real brasileno", "swap_long": 10.5, "swap_short": -14.0},
 
+    # Índices Globales (Restaurados completos)
     "S&P 500": {"ticker": "^GSPC", "clase": "Índice", "cot": "Neutral", "query": "SP 500 bolsa de valores", "swap_long": -1.2, "swap_short": -0.8},
     "Nasdaq 100": {"ticker": "^IXIC", "clase": "Índice", "cot": "Neutral", "query": "Nasdaq 100 bolsa", "swap_long": -1.5, "swap_short": -1.0},
     "Dow Jones": {"ticker": "^DJI", "clase": "Índice", "cot": "Neutral", "query": "Dow Jones industrial", "swap_long": -1.1, "swap_short": -0.7},
     "DAX Alemán": {"ticker": "^GDAXI", "clase": "Índice", "cot": "Neutral", "query": "DAX index Frankfurt", "swap_long": -1.3, "swap_short": -0.9},
+    "FTSE 100": {"ticker": "^FTSE", "clase": "Índice", "cot": "Neutral", "query": "FTSE 100 London stock", "swap_long": -1.0, "swap_short": -0.6},
+    "Nikkei 225": {"ticker": "^N225", "clase": "Índice", "cot": "Neutral", "query": "Nikkei 225 Tokyo", "swap_long": -0.8, "swap_short": -0.5},
 
+    # Commodities Energéticos, Metales y Agrícolas (Restaurados completos)
     "Natural Gas": {"ticker": "NG=F", "clase": "Commodity", "cot": "Neto Comprador (+6k)", "query": "gas natural mercado", "swap_long": -1.8, "swap_short": -0.2},
     "WTI Crude": {"ticker": "CL=F", "clase": "Commodity", "cot": "Neto Vendedor (-8k)", "query": "petroleo WTI crudo", "swap_long": -2.0, "swap_short": 0.5},
     "Brent Crude": {"ticker": "BZ=F", "clase": "Commodity", "cot": "Neutral", "query": "petroleo Brent", "swap_long": -2.2, "swap_short": 0.4},
     "Gold (XAU)": {"ticker": "GC=F", "clase": "Commodity", "cot": "Neto Comprador (+22k)", "query": "oro precio cotizacion", "swap_long": -3.1, "swap_short": 1.0},
     "Silver (XAG)": {"ticker": "SI=F", "clase": "Commodity", "cot": "Neto Comprador (+5k)", "query": "plata precio cotizacion", "swap_long": -2.5, "swap_short": 0.8},
     "Copper": {"ticker": "HG=F", "clase": "Commodity", "cot": "Neto Comprador (+19k)", "query": "cobre precio cotizacion", "swap_long": -1.0, "swap_short": -0.3},
+    "Platinum": {"ticker": "PL=F", "clase": "Commodity", "cot": "Neutral", "query": "platino precio mercado", "swap_long": -1.4, "swap_short": -0.2},
     "Cocoa": {"ticker": "CC=F", "clase": "Softs", "cot": "Neto Comprador (+15k)", "query": "cacao precio mercado", "swap_long": -0.8, "swap_short": -0.5},
     "Coffee": {"ticker": "KC=F", "clase": "Softs", "cot": "Neto Comprador (+11k)", "query": "cafe cotizacion bolsa", "swap_long": -0.9, "swap_short": -0.4},
+    "Sugar": {"ticker": "SB=F", "clase": "Softs", "cot": "Neto Comprador (+7k)", "query": "azucar precio mercado", "swap_long": -0.6, "swap_short": -0.3},
     "Corn": {"ticker": "ZC=F", "clase": "Agricultural", "cot": "Neutral", "query": "maiz cotizacion agricultura", "swap_long": -0.5, "swap_short": -0.2},
+    "Wheat": {"ticker": "ZW=F", "clase": "Agricultural", "cot": "Neutral", "query": "trigo cotizacion bolsa", "swap_long": -0.6, "swap_short": -0.3},
+    "Soybeans": {"ticker": "ZS=F", "clase": "Agricultural", "cot": "Neto Comprador (+9k)", "query": "soja cotizacion mercado", "swap_long": -0.7, "swap_short": -0.3},
+    "Cotton": {"ticker": "CT=F", "clase": "Softs", "cot": "Neutral", "query": "algodon precio mercado", "swap_long": -0.5, "swap_short": -0.2},
 
+    # Criptomonedas
     "Bitcoin": {"ticker": "BTC-USD", "clase": "Crypto", "cot": "Neto Comprador (+30k)", "query": "Bitcoin BTC crypto precio", "swap_long": -12.5, "swap_short": 5.0},
-    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
-}
-
-@st.cache_data(ttl=300)
-def obtener_datos_mercado_real():
-    filas = []
-    for nombre, info in ACTIVOS_TICKERS.items():
-        try:
-            ticker_obj = yf.Ticker(info["ticker"])
-            hist = ticker_obj.history(period="1y")
-            if not hist.empty:
-                precio_actual = hist["Close"].iloc[-1]
-                min_52w = hist["Low"].min()
-                max_52w = hist["High"].max()
-                
-                percentil_1y = ((precio_actual - min_52w) / (max_52w - min_52w)) * 100 if max_52w > min_52w else 50.0
-                hist_3m = hist.tail(63)
-                min_3m = hist_3m["Low"].min()
-                max_3m = hist_3m["High"].max()
-                percentil_3m = ((precio_actual - min_3m) / (max_3m - min_3m)) * 100 if max_3m > min_3m else 50.0
-                estado = "Desviación Baja (≤20%) - Sesgo Comprador" if percentil_1y <= 20 else ("Sobrecompra" if percentil_1y >= 80 else "Rango Medio")
-
-                filas.append({
-                    "Activo": nombre,
-                    "Clase": info["clase"],
-                    "Precio Actual": round(precio_actual, 4),
-                    "Mín 52 Sem": round(min_52w, 4),
-                    "Máx 52 Sem": round(max_52w, 4),
-                    "Percentil 1Y (%)": round(percentil_1y, 1),
-                    "Percentil 3M (%)": round(percentil_3m, 1),
-                    "Estructura Estadística": estado,
-                    "Flujo COT (Institucional)": info["cot"],
-                    "Swap Long ($/lote)": info["swap_long"],
-                    "Swap Short ($/lote)": info["swap_short"]
-                })
-        except Exception:
-            pass
-    return pd.DataFrame(filas)
-
-def obtener_noticias_rss(query_termino):
-    noticias = []
-    try:
-        query_encoded = urllib.parse.quote(query_termino)
-        url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=4) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            channel = root.find('channel')
-            if channel is not None:
-                for item in channel.findall('item')[:3]:
-                    title = item.find('title')
-                    link = item.find('link')
-                    source = item.find('source')
-                    noticias.append({
-                        "title": title.text if title is not None else "Sin título",
-                        "link": link.text if link is not None else "#",
-                        "publisher": source.text if source is not None else "Finanzas"
-                    })
-    except Exception:
-        pass
-    return noticias
-
-# --- CALENDARIO ECONÓMICO (100% GARANTIZADO EN LA SEMANA ACTUAL) ---
-@st.cache_data(ttl=900)
-def obtener_calendario_economico_dinamico():
-    hoy = datetime.now()
-    
-    # Calcular días exactos de la semana en curso
-    lunes = hoy - timedelta(days=hoy.weekday())
-    martes = lunes + timedelta(days=1)
-    miercoles = lunes + timedelta(days=2)
-    jueves = lunes + timedelta(days=3)
-    viernes = lunes + timedelta(days=4)
-
-    eventos = [
-        {"Fecha": lunes.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": martes.strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": miercoles.strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": jueves.strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": viernes.strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo (NFP), PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
-    ]
-    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
@@ -483,12 +447,6 @@ with tab_terminal:
             <a href="{TRADINGVIEW_AFFILIATE_URL}" target="_blank" class="yt-button" style="background-color: #238636;">Explorar Herramientas 📈</a>
         </div>
         """, unsafe_allow_html=True)
-        
-    st.markdown("---")
-    
-    # MÓDULO EXTRA: BINANCE PAY (PÁGINA PRINCIPAL)
-    with st.container():
-        mostrar_binance_pay(st)
 
 
 # ==========================================
