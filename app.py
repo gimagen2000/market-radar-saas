@@ -278,25 +278,52 @@ def obtener_noticias_rss(query_termino):
         pass
     return noticias
 
-# --- CALENDARIO ECONÓMICO (100% GARANTIZADO EN LA SEMANA ACTUAL) ---
+# --- CALENDARIO ECONÓMICO RSS (RESTAURADO MULTI-MEDIO CON FILTRO DE 7 DÍAS) ---
 @st.cache_data(ttl=900)
 def obtener_calendario_economico_dinamico():
-    hoy = datetime.now()
-    
-    lunes = hoy - timedelta(days=hoy.weekday())
-    martes = lunes + timedelta(days=1)
-    miercoles = lunes + timedelta(days=2)
-    jueves = lunes + timedelta(days=3)
-    viernes = lunes + timedelta(days=4)
-
-    eventos = [
-        {"Fecha": lunes.strftime("%a, %d %b %Y"), "Evento": "Declaraciones de política monetaria y expectativas de tipos", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": martes.strftime("%a, %d %b %Y"), "Evento": "Publicación de Índice de Precios al Consumidor (IPC e Inflación Core)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": miercoles.strftime("%a, %d %b %Y"), "Evento": "Decisión de Tasas de Interés (Fed / BCE / Bancos Centrales)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": jueves.strftime("%a, %d %b %Y"), "Evento": "Nuevas Peticiones de Subsidio por Desempleo (Datos de EE.UU.)", "Impacto": "🔴 Alto Impacto", "Link": "https://es.investing.com/economic-calendar/"},
-        {"Fecha": viernes.strftime("%a, %d %b %Y"), "Evento": "Datos Globales de Empleo (NFP), PMI Manufacturero y Servicios", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
-    ]
-    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    eventos = []
+    try:
+        # Usamos el operador 'when:7d' para garantizar que las noticias de medios globales sean de esta misma semana
+        query_termino = "calendario economico forex OR datos macroeconomicos semana when:7d"
+        query_encoded = urllib.parse.quote(query_termino)
+        url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            xml_data = response.read()
+            root = ET.fromstring(xml_data)
+            channel = root.find('channel')
+            if channel is not None:
+                for item in channel.findall('item')[:6]:
+                    title = item.find('title')
+                    pubDate = item.find('pubDate')
+                    link = item.find('link')
+                    
+                    str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
+                    tit_texto = title.text if title is not None else "Evento Económico"
+                    
+                    # Limpiamos el título generado por Google News para hacerlo más estético
+                    if " - " in tit_texto:
+                        tit_texto = tit_texto.rsplit(" - ", 1)[0]
+                        
+                    impacto = "🔴 Alto Impacto" if any(k in tit_texto.lower() for k in ["fed", "inflacion", "ipc", "tasas", "bce", "empleo", "nóminas", "powell"]) else "🟡 Impacto Medio"
+                    
+                    eventos.append({
+                        "Fecha": str_fecha,
+                        "Evento": tit_texto,
+                        "Impacto": impacto,
+                        "Link": link.text if link is not None else "#"
+                    })
+    except Exception:
+        pass
+        
+    if not eventos:
+        # Fallback de seguridad en caso de que la red falle
+        hoy = datetime.now()
+        eventos = [
+            {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Revisar Calendario Económico en Portales (Sin conexión al Feed)", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
+        ]
+    return eventos
+# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
@@ -340,9 +367,9 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS (FECHAS 100% PRECISAS DE ESTA SEMANA)
+    # MÓDULO 2: DATOS ECONÓMICOS (RSS RESTAURADO CON MEDIOS DIVERSOS EN TIEMPO REAL)
     st.header("2. 📊 Datos Económicos Relevantes de la Semana")
-    st.caption("🗓️ **Feed Macroeconómico Global — Actualizado al Día de Hoy**")
+    st.caption("🗓️ **Feed Macroeconómico Global (Noticias y Medios en Tiempo Real)**")
 
     cal_eventos_live = obtener_calendario_economico_dinamico()
     
