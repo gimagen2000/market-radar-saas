@@ -322,8 +322,7 @@ def obtener_calendario_economico_dinamico():
         eventos = [
             {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Revisar Calendario Económico en Portales (Sin conexión al Feed)", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
         ]
-    return eventos
-# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
@@ -487,8 +486,8 @@ with tab_terminal:
                 st.divider()
                 st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales controlando el lotaje.")
 
-    # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP (SIMPLIFICADA A LOTAJE)
-    st.header("4. Calculadora de Riesgo, Lotaje y Costos Swap (Overnight)")
+    # MÓDULO 4: CALCULADORA DE RIESGO Y COSTOS SWAP (SIMPLIFICADA A LOTAJE Y CON TÍTULO DINÁMICO)
+    st.header(f"4. Calculadora de Riesgo, Lotaje y Costos Swap ({activo_sel})")
     c1, c2 = st.columns(2)
     with c1:
         cap = st.number_input("Capital Asignado ($ USD)", value=10000.0, step=500.0)
