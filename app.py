@@ -99,6 +99,7 @@ st.markdown("""
     .ad-button { background-color: #238636; color: white !important; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; }
     .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
     .risk-alert { padding: 12px; border-left: 4px solid #da3633; background-color: rgba(218, 54, 51, 0.1); border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
+    .chat-box { background-color: #1c2128; padding: 15px; border-radius: 8px; border: 1px solid #3fb950; margin-top: 15px; font-size: 14px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -107,16 +108,17 @@ mostrar_logo(st, width=180, center=True)
 st.markdown("<h1 style='text-align: center;'>📊 Market Radar Quant Terminal</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center; color: #8b949e; margin-bottom: 30px;'>Procesamiento Estadístico de Mercados y Cartera Global</h3>", unsafe_allow_html=True)
 
-# --- MEMORIA DE MENSAJES (CONTACTO TIEMPO REAL) ---
+# --- ESTADOS DE SESIÓN (MEMORIA) ---
 if 'mensajes_contacto' not in st.session_state:
     st.session_state.mensajes_contacto = []
-
-# --- BLINDAJE LEGAL (ToS) ---
+if 'chat_michael' not in st.session_state:
+    st.session_state.chat_michael = {"activo": None, "q": "", "a": ""}
 if 'tos_accepted' not in st.session_state:
     st.session_state.tos_accepted = False
 if 'user_plan' not in st.session_state:
     st.session_state.user_plan = "Free"
 
+# --- BLINDAJE LEGAL (ToS) ---
 if not st.session_state.tos_accepted:
     st.markdown("## 🛡️ Términos de Servicio y Descargo Legal (ToS)")
     st.markdown("""
@@ -447,6 +449,44 @@ with tab_terminal:
                     """, unsafe_allow_html=True)
             else:
                 st.info("No hay noticias recientes indexadas.")
+            
+            # =========================================================
+            # NUEVO: CHAT INTERACTIVO CON MICHAEL VIRTUAL (EN EL ESPACIO VACÍO)
+            # =========================================================
+            st.markdown("---")
+            st.markdown(f"#### 💬 Consultar a Michael Virtual")
+            st.caption(f"Escribe tu pregunta sobre la estructura de **{activo_sel}**")
+            
+            # Input de texto simple para la pregunta del usuario
+            user_question = st.text_input("Haz tu consulta aquí...", key=f"input_q_{activo_sel}")
+            
+            if st.button("Enviar Pregunta 🤖", key=f"btn_q_{activo_sel}"):
+                if user_question:
+                    # Lógica contextual dinámica basada en la estructura del activo seleccionado
+                    pct_act = row_sel['Percentil 1Y (%)']
+                    clase_act = row_sel['Clase']
+                    
+                    if pct_act <= 20:
+                        sesgo_ai = "Dado que nos encontramos en una zona de sobreventa extrema, mi modelo sugiere priorizar divergencias alcistas y vigilar soportes institucionales para acumulación."
+                    elif pct_act >= 80:
+                        sesgo_ai = "Al cotizar en una zona de fuerte sobrecompra, la asimetría Long-Only es desfavorable. Sugiero extremar cautela y esperar un retroceso profundo hacia la media."
+                    else:
+                        sesgo_ai = "El activo está consolidando en rango medio. No detecto una asimetría clara para acumulación direccional en este momento."
+                        
+                    respuesta_ai = f"Procesando consulta: '{user_question}'. Respecto a {activo_sel}, {sesgo_ai} Mantén especial vigilancia sobre los datos macroeconómicos asociados al sector {clase_act} esta semana."
+                    
+                    # Guardamos la conversación en la memoria temporal (session_state)
+                    st.session_state.chat_michael = {"activo": activo_sel, "q": user_question, "a": respuesta_ai}
+            
+            # Mostramos la respuesta almacenada si corresponde al activo actual
+            if st.session_state.chat_michael["activo"] == activo_sel and st.session_state.chat_michael["a"]:
+                st.markdown(f"""
+                <div class="chat-box">
+                    <p style="color: #8b949e; font-size: 13px; margin-bottom: 8px;"><b>👤 Tu Consulta:</b> {st.session_state.chat_michael['q']}</p>
+                    <p style="color: #f0f6fc; font-size: 14px; margin-bottom: 0;"><b>🤖 Michael Virtual:</b> {st.session_state.chat_michael['a']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+
 
         # =========================================================
         # RADAR CISNE NEGRO (MEJORADO CON ANÁLISIS POR CAPAS)
@@ -473,7 +513,6 @@ with tab_terminal:
                 st.divider()
                 st.markdown(f"##### 🔬 Análisis Exhaustivo de Capas Fundamentales ({clase_activo})")
                 
-                # --- LÓGICA DINÁMICA DE VULNERABILIDADES POR CLASE DE ACTIVO ---
                 if "Acción" in clase_activo or "Tech" in clase_activo:
                     st.markdown("<div class='risk-alert'><b>1. Capa Operativa y Cadena de Suministro:</b> Bloqueos geopolíticos restrictivos (ej. Taiwán para semiconductores) o escasez crítica de tierras raras que destruyan los márgenes de producción.</div>", unsafe_allow_html=True)
                     st.markdown("<div class='risk-alert'><b>2. Capa Regulatoria (Anti-Monopolio):</b> Intervención sorpresa del DoJ (EE.UU.) o de la Unión Europea forzando la división estructural de la empresa o bloqueos a su desarrollo de IA.</div>", unsafe_allow_html=True)
@@ -499,7 +538,6 @@ with tab_terminal:
                     st.markdown("<div class='risk-alert'><b>2. Capa Regulatoria Draconiana:</b> Prohibiciones legales coordinadas o cierres abruptos de rampas fiat/bancarias en las principales jurisdicciones económicas (EE.UU., Europa).</div>", unsafe_allow_html=True)
                     st.markdown("<div class='risk-alert'><b>3. Capa Criptográfica y Hacks Nivel 0:</b> Descubrimiento de vulnerabilidades críticas en el código fuente de protocolos Layer 1 o hackeos masivos a los exchanges centralizados de mayor volumen.</div>", unsafe_allow_html=True)
                 
-                # --- CUADRO DEL MARCO TEÓRICO ORIGINAL (CONSERVADO EN UN EXPANDER) ---
                 with st.expander("📚 Marco Teórico de Vulnerabilidades (Conceptos Generales de la Terminal)"):
                     st.markdown("##### 🏛️ 1. Macro-Geopolítica y Liquidez Soberana")
                     st.markdown("- **Guerra de Divisas y Liquidez Interbancaria:** Riesgo de restricción de liquidez por parte de bancos centrales que fuerce una liquidación en cadena de colaterales.")
