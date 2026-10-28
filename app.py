@@ -99,7 +99,7 @@ st.markdown("""
     .ad-button { background-color: #238636; color: white !important; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; }
     .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
     .risk-alert { padding: 12px; border-left: 4px solid #da3633; background-color: rgba(218, 54, 51, 0.1); border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
-    .chat-box { background-color: #1c2128; padding: 15px; border-radius: 8px; border: 1px solid #3fb950; margin-top: 15px; font-size: 14px; }
+    .chat-box { background-color: #1c2128; padding: 18px; border-radius: 8px; border: 1px solid #58a6ff; margin-top: 15px; font-size: 14.5px; line-height: 1.6; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -451,39 +451,53 @@ with tab_terminal:
                 st.info("No hay noticias recientes indexadas.")
             
             # =========================================================
-            # NUEVO: CHAT INTERACTIVO CON MICHAEL VIRTUAL (EN EL ESPACIO VACÍO)
+            # CHAT INTERACTIVO (LENGUAJE NATURAL + CONCLUSIONES WEB RSS)
             # =========================================================
             st.markdown("---")
             st.markdown(f"#### 💬 Consultar a Michael Virtual")
-            st.caption(f"Escribe tu pregunta sobre la estructura de **{activo_sel}**")
+            st.caption(f"Pregúntame sobre la proyección de **{activo_sel}**")
             
-            # Input de texto simple para la pregunta del usuario
             user_question = st.text_input("Haz tu consulta aquí...", key=f"input_q_{activo_sel}")
             
             if st.button("Enviar Pregunta 🤖", key=f"btn_q_{activo_sel}"):
                 if user_question:
-                    # Lógica contextual dinámica basada en la estructura del activo seleccionado
                     pct_act = row_sel['Percentil 1Y (%)']
                     clase_act = row_sel['Clase']
                     
+                    # 1. Análisis Técnico Conversacional
                     if pct_act <= 20:
-                        sesgo_ai = "Dado que nos encontramos en una zona de sobreventa extrema, mi modelo sugiere priorizar divergencias alcistas y vigilar soportes institucionales para acumulación."
+                        estado_tecnico = f"técnicamente está súper castigado (en el {pct_act}% de su rango anual), tocando casi el piso. Como sabes, en nuestra estrategia Long-Only, esta es una zona interesantísima para buscar compras con paciencia."
                     elif pct_act >= 80:
-                        sesgo_ai = "Al cotizar en una zona de fuerte sobrecompra, la asimetría Long-Only es desfavorable. Sugiero extremar cautela y esperar un retroceso profundo hacia la media."
+                        estado_tecnico = f"ahora mismo está volando (en el {pct_act}% de su rango anual), muy cerca de su techo histórico. Sinceramente, entrar comprando aquí es arriesgado; yo preferiría esperar a que el precio corrija un poco hacia abajo."
                     else:
-                        sesgo_ai = "El activo está consolidando en rango medio. No detecto una asimetría clara para acumulación direccional en este momento."
+                        estado_tecnico = f"está justo a mitad de camino, en un rango bastante neutral ({pct_act}% anual). Al no estar en un extremo claro, la estadística nos dice que mejor tener cautela antes de posicionarnos fuerte."
                         
-                    respuesta_ai = f"Procesando consulta: '{user_question}'. Respecto a {activo_sel}, {sesgo_ai} Mantén especial vigilancia sobre los datos macroeconómicos asociados al sector {clase_act} esta semana."
+                    # 2. Análisis Web Dinámico (Scraping de Noticias en tiempo real)
+                    # Obtenemos las noticias específicas de este activo para sacar conclusiones
+                    noticias_recientes = obtener_noticias_rss(ACTIVOS_TICKERS[activo_sel]["query"])
                     
-                    # Guardamos la conversación en la memoria temporal (session_state)
+                    if noticias_recientes:
+                        titulares = [n['title'] for n in noticias_recientes[:2]]
+                        if len(titulares) > 1:
+                            contexto_web = f"Además, acabo de escanear la web y los medios financieros están destacando titulares como: *'{titulares[0]}'* y también *'{titulares[1]}'*. "
+                        else:
+                            contexto_web = f"Además, revisando la web de última hora, el tema central parece ser: *'{titulares[0]}'*. "
+                        
+                        conclusion_final = f"**En conclusión:** uniendo tu duda sobre '{user_question}' con lo que pasa ahí afuera, te sugiero que te guíes por la barrera técnica que te comenté y no te dejes llevar solo por el ruido mediático. Usa siempre nuestra calculadora de lotaje."
+                    else:
+                        contexto_web = "He revisado la web de última hora, pero no detecto noticias de altísimo impacto recientes en los principales portales para este instrumento. "
+                        conclusion_final = f"**En conclusión para tu duda ('{user_question}'):** guíate puramente por la matemática técnica actual, y vigila la calculadora de swap si vas a mantener posición abierta varios días."
+
+                    # 3. Armar la respuesta final humana
+                    respuesta_ai = f"¡Hola! Estuve analizando **{activo_sel}** para responderte. Te cuento: {estado_tecnico} <br><br>{contexto_web} {conclusion_final}"
+                    
                     st.session_state.chat_michael = {"activo": activo_sel, "q": user_question, "a": respuesta_ai}
             
-            # Mostramos la respuesta almacenada si corresponde al activo actual
             if st.session_state.chat_michael["activo"] == activo_sel and st.session_state.chat_michael["a"]:
                 st.markdown(f"""
                 <div class="chat-box">
-                    <p style="color: #8b949e; font-size: 13px; margin-bottom: 8px;"><b>👤 Tu Consulta:</b> {st.session_state.chat_michael['q']}</p>
-                    <p style="color: #f0f6fc; font-size: 14px; margin-bottom: 0;"><b>🤖 Michael Virtual:</b> {st.session_state.chat_michael['a']}</p>
+                    <p style="color: #8b949e; font-size: 13px; margin-bottom: 8px;"><b>👤 Tú preguntaste:</b> {st.session_state.chat_michael['q']}</p>
+                    <p style="color: #f0f6fc; margin-bottom: 0;"><b>🤖 Michael Virtual dice:</b><br> {st.session_state.chat_michael['a']}</p>
                 </div>
                 """, unsafe_allow_html=True)
 
