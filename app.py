@@ -98,6 +98,7 @@ st.markdown("""
     .ad-title { color: #e3b341; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
     .ad-button { background-color: #238636; color: white !important; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; }
     .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
+    .risk-alert { padding: 12px; border-left: 4px solid #da3633; background-color: rgba(218, 54, 51, 0.1); border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -283,7 +284,6 @@ def obtener_noticias_rss(query_termino):
 def obtener_calendario_economico_dinamico():
     eventos = []
     try:
-        # Usamos el operador 'when:7d' para garantizar que las noticias de medios globales sean de esta misma semana
         query_termino = "calendario economico forex OR datos macroeconomicos semana when:7d"
         query_encoded = urllib.parse.quote(query_termino)
         url = f"https://news.google.com/rss/search?q={query_encoded}&hl=es&gl=ES&ceid=ES:es"
@@ -301,7 +301,6 @@ def obtener_calendario_economico_dinamico():
                     str_fecha = pubDate.text[:16] if pubDate is not None else "Reciente"
                     tit_texto = title.text if title is not None else "Evento Económico"
                     
-                    # Limpiamos el título generado por Google News para hacerlo más estético
                     if " - " in tit_texto:
                         tit_texto = tit_texto.rsplit(" - ", 1)[0]
                         
@@ -317,7 +316,6 @@ def obtener_calendario_economico_dinamico():
         pass
         
     if not eventos:
-        # Fallback de seguridad en caso de que la red falle
         hoy = datetime.now()
         eventos = [
             {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Revisar Calendario Económico en Portales (Sin conexión al Feed)", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
@@ -366,7 +364,7 @@ with tab_terminal:
     else:
         st.info("No hay activos que cumplan con el filtro seleccionado.")
 
-    # MÓDULO 2: DATOS ECONÓMICOS (RSS RESTAURADO CON MEDIOS DIVERSOS EN TIEMPO REAL)
+    # MÓDULO 2: DATOS ECONÓMICOS
     st.header("2. 📊 Datos Económicos Relevantes de la Semana")
     st.caption("🗓️ **Feed Macroeconómico Global (Noticias y Medios en Tiempo Real)**")
 
@@ -450,38 +448,68 @@ with tab_terminal:
             else:
                 st.info("No hay noticias recientes indexadas.")
 
-        # RADAR CISNE NEGRO
+        # =========================================================
+        # RADAR CISNE NEGRO (MEJORADO CON ANÁLISIS POR CAPAS)
+        # =========================================================
         st.markdown("---")
         st.markdown("### 🦅 Radar de Cisne Negro — Síntesis Analítica de Mercado")
         
         st.markdown("""
         <div class="disclaimer-box" style="border-left-color: #da3633;">
-        <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual evalúa fragilidades macro-geopolíticas, flujos de liquidez, patrones de volatilidad derivados y trampas de mercado sobre el activo seleccionado.
+        <b>SÍNTESIS DE RIESGOS DE COLA (TAIL RISK):</b> Michael Virtual evalúa las fragilidades macro-geopolíticas y trampas institucionales estructurales exclusivas para la clase de este activo.
         </div>
         """, unsafe_allow_html=True)
 
         if st.button("🔍 Investigar Vulnerabilidades y Causas de Cisne Negro"):
             percentil = row_sel['Percentil 1Y (%)']
+            clase_activo = row_sel['Clase']
             nivel_vulnerabilidad = "ELEVADA" if (percentil > 85 or percentil < 15) else "MODERADA"
             color_vulnerabilidad = "#f85149" if nivel_vulnerabilidad == "ELEVADA" else "#d29922"
 
             with st.container():
-                st.markdown(f"#### 🚨 Informe de Vulnerabilidad y Estrés Extremo: **{row_sel['Activo']}**")
-                st.markdown(f"**Índice de Fragilidad Cuantitativa:** <span style='color:{color_vulnerabilidad}; font-weight:bold;'>{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span>", unsafe_allow_html=True)
+                st.markdown(f"#### 🚨 Informe de Vulnerabilidad Cuantitativa: **{row_sel['Activo']}**")
+                st.markdown(f"**Índice de Fragilidad:** <span style='color:{color_vulnerabilidad}; font-weight:bold;'>{nivel_vulnerabilidad} ({percentil}% Percentil 1Y)</span>", unsafe_allow_html=True)
                 
                 st.divider()
+                st.markdown(f"##### 🔬 Análisis Exhaustivo de Capas Fundamentales ({clase_activo})")
                 
-                st.markdown("##### 🏛️ 1. Macro-Geopolítica y Liquidez Soberana")
-                st.markdown("- **Guerra de Divisas y Liquidez Interbancaria:** Riesgo de restricción de liquidez por parte de bancos centrales que fuerce una liquidación en cadena de colaterales.")
-                st.markdown("- **Escalada Geopolítica / Shocks de Suministro:** Disrupción en transporte marítimo o energía que descontrole la inflación y fuerce alzas de tasas no descontadas.")
+                # --- LÓGICA DINÁMICA DE VULNERABILIDADES POR CLASE DE ACTIVO ---
+                if "Acción" in clase_activo or "Tech" in clase_activo:
+                    st.markdown("<div class='risk-alert'><b>1. Capa Operativa y Cadena de Suministro:</b> Bloqueos geopolíticos restrictivos (ej. Taiwán para semiconductores) o escasez crítica de tierras raras que destruyan los márgenes de producción.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>2. Capa Regulatoria (Anti-Monopolio):</b> Intervención sorpresa del DoJ (EE.UU.) o de la Unión Europea forzando la división estructural de la empresa o bloqueos a su desarrollo de IA.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>3. Capa de Liquidez Institucional:</b> Reporte sorpresivo de recortes drásticos de 'guidance' (expectativas futuras) que detone una liquidación en cascada por parte de algoritmos institucionales de alta frecuencia (HFT).</div>", unsafe_allow_html=True)
                 
-                st.markdown("##### 📈 2. Volatilidad, Estructura de Liquidez y Flujos Institucionales")
-                st.markdown("- **Atrapamiento de Volatilidad (VIX Spike) & Gamma Squeeze:** Ruptura de niveles clave donde la acumulación de opciones fuerce a creadores de mercado a coberturas masivas.")
-                st.markdown("- **Cierre Repentino de Ventanas de Repos:** Descalce de colaterales en balances bancarios de gran escala.")
+                elif "Forex" in clase_activo:
+                    st.markdown("<div class='risk-alert'><b>1. Capa de Intervención Soberana:</b> Abandono sorpresivo de políticas monetarias por parte del Banco Central (ej. control de curva de rendimientos del BoJ) o intervenciones directas no esterilizadas.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>2. Capa de Deuda y Riesgo Sistémico:</b> Impago imprevisto de deuda periférica o crisis bancaria sistémica que fuerce la repatriación violenta de capitales hacia monedas refugio.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>3. Capa Macro-Geopolítica (Guerra Comercial):</b> Imposición unilateral de aranceles paralizantes que destruyan la balanza comercial y exportadora del país en cuestión en horas.</div>", unsafe_allow_html=True)
                 
-                st.markdown("##### 🎯 3. Psicología Institucional y Trampas de Mercado")
-                st.markdown(f"- **Barridos de Liquidez en Extremos Anuales:** Falsas rupturas (*fakes*) cerca del suelo/techo anual **({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']})** diseñadas para absorber liquidez minorista.")
-                st.markdown("- **Distribución Silenciosa:** Narrativas optimistas mediáticas mientras el *Smart Money* rota capital silenciosamente.")
+                elif "Commodity" in clase_activo or "Softs" in clase_activo or "Agricultural" in clase_activo:
+                    st.markdown("<div class='risk-alert'><b>1. Capa Logística y Cuellos de Botella:</b> Cierres de tránsito en rutas marítimas críticas (Estrecho de Ormuz, Canal de Suez) o paros portuarios globales que paralicen la oferta física.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>2. Capa de Shocks Climáticos y Fuerza Mayor:</b> Anomalías meteorológicas agresivas no descontadas (El Niño severo) que destrocen las proyecciones anuales de cosechas globales.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>3. Capa Institucional y de Inventarios:</b> Suspensión no anunciada de cuotas de producción (OPEP+) o descubrimiento de fraudes/vacíos masivos de recibos en almacenes regulados (LME).</div>", unsafe_allow_html=True)
+                
+                elif "Índice" in clase_activo:
+                    st.markdown("<div class='risk-alert'><b>1. Capa de Contagio Bancario (Credit Crunch):</b> Quiebra repentina de un banco de importancia sistémica (G-SIB) que congele instantáneamente el crédito y la liquidez interbancaria.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>2. Capa de Microestructura (Flash Crash):</b> Reacción en cadena por trampas algorítmicas o ventas institucionales masivas que vacíen el libro de órdenes (Gamma Squeeze inverso).</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>3. Capa Geopolítica Extrema:</b> Escalamiento militar imprevisto entre superpotencias que obligue al cierre temporal de bolsas y mercados financieros para evitar pánicos.</div>", unsafe_allow_html=True)
+                
+                elif "Crypto" in clase_activo:
+                    st.markdown("<div class='risk-alert'><b>1. Capa Estructural de Liquidez (De-peg):</b> Pérdida de paridad catastrófica en stablecoins sistémicas (USDT o USDC) que drene casi por completo la liquidez del mercado.</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>2. Capa Regulatoria Draconiana:</b> Prohibiciones legales coordinadas o cierres abruptos de rampas fiat/bancarias en las principales jurisdicciones económicas (EE.UU., Europa).</div>", unsafe_allow_html=True)
+                    st.markdown("<div class='risk-alert'><b>3. Capa Criptográfica y Hacks Nivel 0:</b> Descubrimiento de vulnerabilidades críticas en el código fuente de protocolos Layer 1 o hackeos masivos a los exchanges centralizados de mayor volumen.</div>", unsafe_allow_html=True)
+                
+                # --- CUADRO DEL MARCO TEÓRICO ORIGINAL (CONSERVADO EN UN EXPANDER) ---
+                with st.expander("📚 Marco Teórico de Vulnerabilidades (Conceptos Generales de la Terminal)"):
+                    st.markdown("##### 🏛️ 1. Macro-Geopolítica y Liquidez Soberana")
+                    st.markdown("- **Guerra de Divisas y Liquidez Interbancaria:** Riesgo de restricción de liquidez por parte de bancos centrales que fuerce una liquidación en cadena de colaterales.")
+                    st.markdown("- **Escalada Geopolítica / Shocks de Suministro:** Disrupción en transporte marítimo o energía que descontrole la inflación y fuerce alzas de tasas no descontadas.")
+                    st.markdown("##### 📈 2. Volatilidad, Estructura de Liquidez y Flujos Institucionales")
+                    st.markdown("- **Atrapamiento de Volatilidad (VIX Spike) & Gamma Squeeze:** Ruptura de niveles clave donde la acumulación de opciones fuerce a creadores de mercado a coberturas masivas.")
+                    st.markdown("- **Cierre Repentino de Ventanas de Repos:** Descalce de colaterales en balances bancarios de gran escala.")
+                    st.markdown("##### 🎯 3. Psicología Institucional y Trampas de Mercado")
+                    st.markdown(f"- **Barridos de Liquidez en Extremos Anuales:** Falsas rupturas (*fakes*) cerca del suelo/techo anual **({row_sel['Mín 52 Sem']} - {row_sel['Máx 52 Sem']})** diseñadas para absorber liquidez minorista.")
+                    st.markdown("- **Distribución Silenciosa:** Narrativas optimistas mediáticas mientras el *Smart Money* rota capital silenciosamente.")
                 
                 st.divider()
                 st.success(f"**🛡️ Dictamen de Protección (Michael Virtual):** 'No intentes adivinar el Cisne Negro; prepárate para sobrevivirlo.' Mantener estricta asimetría Long-Only en mínimos anuales controlando el lotaje.")
