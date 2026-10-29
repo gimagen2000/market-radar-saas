@@ -5,6 +5,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import urllib.parse
 import os
+import re
 from datetime import datetime, timedelta
 
 # --- CONFIGURACIÓN DE PÁGINA ---
@@ -100,6 +101,7 @@ st.markdown("""
     .yt-button { background-color: #FF0000; color: white !important; padding: 6px 14px; border-radius: 5px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 5px; }
     .risk-alert { padding: 12px; border-left: 4px solid #da3633; background-color: rgba(218, 54, 51, 0.1); border-radius: 4px; margin-bottom: 10px; font-size: 14px; }
     .chat-box { background-color: #1c2128; padding: 18px; border-radius: 8px; border: 1px solid #58a6ff; margin-top: 15px; font-size: 14.5px; line-height: 1.6; }
+    .chat-pill { display: inline-block; background-color: #30363d; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; margin-right: 5px; margin-bottom: 5px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -140,27 +142,26 @@ if not st.session_state.tos_accepted:
 # --- BARRA LATERAL (SAAS Y ADS) ---
 with st.sidebar:
     st.title("🔐 Licencia SaaS")
+    user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
+    selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
 
-user_email = st.sidebar.text_input("Correo Registrado", "usuario@ejemplo.com")
-selected_plan = st.sidebar.selectbox("Plan de Suscripción", ["Basic (Gratuito)", "Pro ($19.99/mes)", "Institutional / VIP ($49.99/mes)"])
+    if st.sidebar.button("Validar Licencia"):
+        if "Pro" in selected_plan:
+            st.session_state.user_plan = "Pro"
+        elif "Institutional" in selected_plan:
+            st.session_state.user_plan = "Institutional"
+        else:
+            st.session_state.user_plan = "Free"
+        st.sidebar.success(f"Nivel Activo: {st.session_state.user_plan}")
 
-if st.sidebar.button("Validar Licencia"):
-    if "Pro" in selected_plan:
-        st.session_state.user_plan = "Pro"
-    elif "Institutional" in selected_plan:
-        st.session_state.user_plan = "Institutional"
-    else:
-        st.session_state.user_plan = "Free"
-    st.sidebar.success(f"Nivel Activo: {st.session_state.user_plan}")
-
-if st.session_state.user_plan == "Free":
-    st.sidebar.markdown(f"""
-    <div class="ad-container">
-        <div class="ad-title">Anuncio Patrocinado</div>
-        <p style="font-size: 12px; color: #c9d1d9;">¿Buscas un Broker regulado para operar Long-Only con bajos spreads?</p>
-        <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Abrir Cuenta en Libertex 🚀</a>
-    </div>
-    """, unsafe_allow_html=True)
+    if st.session_state.user_plan == "Free":
+        st.sidebar.markdown(f"""
+        <div class="ad-container">
+            <div class="ad-title">Anuncio Patrocinado</div>
+            <p style="font-size: 12px; color: #c9d1d9;">¿Buscas un Broker regulado para operar Long-Only con bajos spreads?</p>
+            <a href="{LIBERTEX_AFFILIATE_URL}" target="_blank" class="ad-button">Abrir Cuenta en Libertex 🚀</a>
+        </div>
+        """, unsafe_allow_html=True)
     
 # --- CARTERA COMPLETA DE ACTIVOS GLOBALES (FUSIÓN TOTAL) ---
 ACTIVOS_TICKERS = {
@@ -221,6 +222,7 @@ ACTIVOS_TICKERS = {
     "Ethereum": {"ticker": "ETH-USD", "clase": "Crypto", "cot": "Neto Comprador (+12k)", "query": "Ethereum ETH crypto", "swap_long": -8.0, "swap_short": 3.2}
 }
 
+# --- FUNCIONES DE EXTRACCIÓN DE DATOS Y ANÁLISIS ---
 @st.cache_data(ttl=300)
 def obtener_datos_mercado_real():
     filas = []
@@ -257,6 +259,46 @@ def obtener_datos_mercado_real():
             pass
     return pd.DataFrame(filas)
 
+@st.cache_data(ttl=3600)
+def obtener_contexto_macro():
+    # Extrae el rendimiento del bono a 10 años y el VIX para dar contexto de política monetaria y miedo
+    try:
+        tnx = yf.Ticker("^TNX").history(period="1mo")
+        vix = yf.Ticker("^VIX").history(period="1mo")
+        tnx_current = tnx['Close'].iloc[-1]
+        vix_current = vix['Close'].iloc[-1]
+        
+        tendencia_tasas = "Tasas elevadas / Riesgo de liquidez" if tnx_current > 4.0 else "Tasas relajándose / Entorno pro-riesgo"
+        entorno_vix = "Volatilidad controlada" if vix_current < 18 else "Estrés sistémico (Gamma Squeeze potencial)"
+        
+        return f"{tnx_current:.2f}% ({tendencia_tasas})", f"{vix_current:.1f} ({entorno_vix})"
+    except:
+        return "No disponible", "No disponible"
+
+def analizar_sentimiento_nlp(titulares):
+    # Simula un análisis NLP contando polaridad de palabras en los titulares RSS
+    if not titulares:
+        return "Neutral (Falta de datos mediáticos)"
+    
+    texto = " ".join(titulares).lower()
+    alcistas = ["sube", "alza", "crecimiento", "récord", "gana", "optimismo", "dispara", "compra", "bull", "impulso"]
+    bajistas = ["cae", "baja", "desploma", "recesión", "miedo", "riesgo", "pierde", "venta", "bear", "crisis", "tensión"]
+    
+    score_a = sum(1 for w in alcistas if re.search(r'\b' + w + r'\b', texto))
+    score_b = sum(1 for w in bajistas if re.search(r'\b' + w + r'\b', texto))
+    total = score_a + score_b
+    
+    if total == 0:
+        return "Neutral / Lateral (Consenso indeciso)"
+    
+    ratio = (score_a / total) * 100
+    if ratio >= 65:
+        return "Extremo Optimismo (Posible fase de distribución retail)"
+    elif ratio <= 35:
+        return "Pánico Mediático (Posible zona de acumulación institucional)"
+    else:
+        return "Mixto / Consolidación de narrativas"
+
 def obtener_noticias_rss(query_termino):
     noticias = []
     try:
@@ -268,7 +310,7 @@ def obtener_noticias_rss(query_termino):
             root = ET.fromstring(xml_data)
             channel = root.find('channel')
             if channel is not None:
-                for item in channel.findall('item')[:3]:
+                for item in channel.findall('item')[:4]:
                     title = item.find('title')
                     link = item.find('link')
                     source = item.find('source')
@@ -322,7 +364,8 @@ def obtener_calendario_economico_dinamico():
         eventos = [
             {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Revisar Calendario Económico en Portales (Sin conexión al Feed)", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
         ]
-    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    return eventos
+# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
@@ -336,6 +379,7 @@ tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
 with tab_terminal:
     with st.spinner("Actualizando cotizaciones globales en vivo..."):
         df_market_full = obtener_datos_mercado_real()
+        us10y_context, vix_context = obtener_contexto_macro()
 
     def estilizar_condicion_pub(row):
         color = ''
@@ -451,53 +495,54 @@ with tab_terminal:
                 st.info("No hay noticias recientes indexadas.")
             
             # =========================================================
-            # CHAT INTERACTIVO (LENGUAJE NATURAL + CONCLUSIONES WEB RSS)
+            # CHAT AVANZADO: MACRO + NLP SENTIMENT + COT
             # =========================================================
             st.markdown("---")
             st.markdown(f"#### 💬 Consultar a Michael Virtual")
-            st.caption(f"Pregúntame sobre la proyección de **{activo_sel}**")
+            st.caption(f"Pregunta sobre {activo_sel} y procesaré el contexto web.")
             
-            user_question = st.text_input("Haz tu consulta aquí...", key=f"input_q_{activo_sel}")
+            user_question = st.text_input("Haz tu consulta analítica aquí...", key=f"input_q_{activo_sel}")
             
-            if st.button("Enviar Pregunta 🤖", key=f"btn_q_{activo_sel}"):
+            if st.button("Procesar Escaneo Cuantitativo 🤖", key=f"btn_q_{activo_sel}"):
                 if user_question:
+                    # 1. Extraer variables actuales
                     pct_act = row_sel['Percentil 1Y (%)']
                     clase_act = row_sel['Clase']
+                    cot_flujo = row_sel['Flujo COT (Institucional)']
                     
-                    # 1. Análisis Técnico Conversacional
+                    # 2. Análisis NLP de Titulares
+                    titulares_para_nlp = [n['title'] for n in noticias]
+                    sentimiento_nlp = analizar_sentimiento_nlp(titulares_para_nlp)
+                    
+                    # 3. Lógica conversacional de la AI
+                    respuesta_ai = f"Hola. He procesado tu consulta sobre **{user_question}** cruzando nuestra data algorítmica con el flujo web en tiempo real. Aquí tienes mi lectura institucional en 3 capas:<br><br>"
+                    
+                    respuesta_ai += f"<span class='chat-pill'>📊 1. Capa Técnica & Flujos COT</span><br>"
                     if pct_act <= 20:
-                        estado_tecnico = f"técnicamente está súper castigado (en el {pct_act}% de su rango anual), tocando casi el piso. Como sabes, en nuestra estrategia Long-Only, esta es una zona interesantísima para buscar compras con paciencia."
+                        respuesta_ai += f"Técnicamente el activo está muy castigado (suelo del **{pct_act}%** anual). Además, el reporte COT nos indica que el posicionamiento mayorista está **{cot_flujo}**. Esta divergencia es el clásico escenario donde buscamos acumular Long-Only con bajo apalancamiento.<br><br>"
                     elif pct_act >= 80:
-                        estado_tecnico = f"ahora mismo está volando (en el {pct_act}% de su rango anual), muy cerca de su techo histórico. Sinceramente, entrar comprando aquí es arriesgado; yo preferiría esperar a que el precio corrija un poco hacia abajo."
+                        respuesta_ai += f"Técnicamente el activo está en ebullición (techo del **{pct_act}%** anual) con el Smart Money posicionado como **{cot_flujo}**. Comprar en estos techos suele ser una trampa de liquidez; prefiero esperar retrocesos.<br><br>"
                     else:
-                        estado_tecnico = f"está justo a mitad de camino, en un rango bastante neutral ({pct_act}% anual). Al no estar en un extremo claro, la estadística nos dice que mejor tener cautela antes de posicionarnos fuerte."
-                        
-                    # 2. Análisis Web Dinámico (Scraping de Noticias en tiempo real)
-                    # Obtenemos las noticias específicas de este activo para sacar conclusiones
-                    noticias_recientes = obtener_noticias_rss(ACTIVOS_TICKERS[activo_sel]["query"])
-                    
-                    if noticias_recientes:
-                        titulares = [n['title'] for n in noticias_recientes[:2]]
-                        if len(titulares) > 1:
-                            contexto_web = f"Además, acabo de escanear la web y los medios financieros están destacando titulares como: *'{titulares[0]}'* y también *'{titulares[1]}'*. "
-                        else:
-                            contexto_web = f"Además, revisando la web de última hora, el tema central parece ser: *'{titulares[0]}'*. "
-                        
-                        conclusion_final = f"**En conclusión:** uniendo tu duda sobre '{user_question}' con lo que pasa ahí afuera, te sugiero que te guíes por la barrera técnica que te comenté y no te dejes llevar solo por el ruido mediático. Usa siempre nuestra calculadora de lotaje."
-                    else:
-                        contexto_web = "He revisado la web de última hora, pero no detecto noticias de altísimo impacto recientes en los principales portales para este instrumento. "
-                        conclusion_final = f"**En conclusión para tu duda ('{user_question}'):** guíate puramente por la matemática técnica actual, y vigila la calculadora de swap si vas a mantener posición abierta varios días."
+                        respuesta_ai += f"Estamos en un rango medio aburrido (**{pct_act}%** anual) y el Flujo Institucional marca **{cot_flujo}**. La matemática nos sugiere no forzar operaciones aquí.<br><br>"
 
-                    # 3. Armar la respuesta final humana
-                    respuesta_ai = f"¡Hola! Estuve analizando **{activo_sel}** para responderte. Te cuento: {estado_tecnico} <br><br>{contexto_web} {conclusion_final}"
+                    respuesta_ai += f"<span class='chat-pill'>🌍 2. Capa de Política Monetaria y Miedo</span><br>"
+                    respuesta_ai += f"Monitoreando la liquidez global, el Bono US10Y marca **{us10y_context}** y el VIX está en **{vix_context}**. Esto me dice que el entorno macro {'es hostil para el crecimiento agresivo' if 'Riesgo' in us10y_context else 'está dando oxígeno a los mercados'}, factor clave si vas a operar {clase_act}.<br><br>"
                     
+                    respuesta_ai += f"<span class='chat-pill'>📰 3. Capa de Sentimiento Web (NLP)</span><br>"
+                    respuesta_ai += f"Tras escanear y cuantificar las noticias recientes de {activo_sel}, el algoritmo detecta un sesgo de: **{sentimiento_nlp}**. <br><br>"
+                    
+                    respuesta_ai += f"**💡 Conclusión para tu operativa:** Si decides entrar, que sea respetando estrictamente el percentil y ajustando el lotaje al mínimo anual en la calculadora. El ruido de las noticias suele estar diseñado para atrapar al minorista."
+                    
+                    # Guardamos la conversación
                     st.session_state.chat_michael = {"activo": activo_sel, "q": user_question, "a": respuesta_ai}
             
+            # Renderizado del chat
             if st.session_state.chat_michael["activo"] == activo_sel and st.session_state.chat_michael["a"]:
                 st.markdown(f"""
                 <div class="chat-box">
-                    <p style="color: #8b949e; font-size: 13px; margin-bottom: 8px;"><b>👤 Tú preguntaste:</b> {st.session_state.chat_michael['q']}</p>
-                    <p style="color: #f0f6fc; margin-bottom: 0;"><b>🤖 Michael Virtual dice:</b><br> {st.session_state.chat_michael['a']}</p>
+                    <p style="color: #8b949e; font-size: 13px; margin-bottom: 12px; border-bottom: 1px solid #30363d; padding-bottom: 5px;">
+                    <b>👤 Tú preguntaste:</b> "{st.session_state.chat_michael['q']}"</p>
+                    <div style="color: #f0f6fc;">{st.session_state.chat_michael['a']}</div>
                 </div>
                 """, unsafe_allow_html=True)
 
