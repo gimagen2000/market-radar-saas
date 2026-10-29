@@ -261,7 +261,6 @@ def obtener_datos_mercado_real():
 
 @st.cache_data(ttl=3600)
 def obtener_contexto_macro():
-    # Extrae el rendimiento del bono a 10 años y el VIX para dar contexto de política monetaria y miedo
     try:
         tnx = yf.Ticker("^TNX").history(period="1mo")
         vix = yf.Ticker("^VIX").history(period="1mo")
@@ -276,7 +275,6 @@ def obtener_contexto_macro():
         return "No disponible", "No disponible"
 
 def analizar_sentimiento_nlp(titulares):
-    # Simula un análisis NLP contando polaridad de palabras en los titulares RSS
     if not titulares:
         return "Neutral (Falta de datos mediáticos)"
     
@@ -392,6 +390,19 @@ with tab_terminal:
             color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
         return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
+    # --- NUEVO MÓDULO: INSTALACIÓN PWA EN PORTADA ---
+    st.markdown("""
+    <div class="quant-card" style="border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 25px;">
+    <h4 style="margin-top:0;">📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
+    <p style="font-size: 13.5px; color: #c9d1d9;">Market Radar está optimizado como una Aplicación Web Progresiva (PWA). Sigue estos pasos para instalarla y usarla a pantalla completa, sin descargas de tienda:</p>
+    <ul style="font-size: 13px; color: #c9d1d9; line-height: 1.5; margin-bottom: 0;">
+        <li><b>📱 Android (Chrome):</b> Abre este enlace en Chrome, toca los 3 puntos (arriba a la derecha) y selecciona <b>"Agregar a la pantalla principal"</b>.</li>
+        <li><b>🍎 iOS / iPhone (Safari):</b> Abre este enlace en Safari, toca el ícono de compartir y selecciona <b>"Agregar a inicio"</b>.</li>
+        <li><b>💻 macOS (Safari):</b> Ve a "Archivo" en la barra superior de tu Mac y selecciona <b>"Agregar al Dock"</b>.</li>
+    </ul>
+    </div>
+    """, unsafe_allow_html=True)
+
     # MÓDULO 1: EXPLORADOR DE CARTERA GLOBAL
     st.header("1. Explorador de Cartera Global y Percentiles Anuales")
     col_f1, col_f2 = st.columns(2)
@@ -505,16 +516,13 @@ with tab_terminal:
             
             if st.button("Procesar Escaneo Cuantitativo 🤖", key=f"btn_q_{activo_sel}"):
                 if user_question:
-                    # 1. Extraer variables actuales
                     pct_act = row_sel['Percentil 1Y (%)']
                     clase_act = row_sel['Clase']
                     cot_flujo = row_sel['Flujo COT (Institucional)']
                     
-                    # 2. Análisis NLP de Titulares
                     titulares_para_nlp = [n['title'] for n in noticias]
                     sentimiento_nlp = analizar_sentimiento_nlp(titulares_para_nlp)
                     
-                    # 3. Lógica conversacional de la AI
                     respuesta_ai = f"Hola. He procesado tu consulta sobre **{user_question}** cruzando nuestra data algorítmica con el flujo web en tiempo real. Aquí tienes mi lectura institucional en 3 capas:<br><br>"
                     
                     respuesta_ai += f"<span class='chat-pill'>📊 1. Capa Técnica & Flujos COT</span><br>"
@@ -533,10 +541,8 @@ with tab_terminal:
                     
                     respuesta_ai += f"**💡 Conclusión para tu operativa:** Si decides entrar, que sea respetando estrictamente el percentil y ajustando el lotaje al mínimo anual en la calculadora. El ruido de las noticias suele estar diseñado para atrapar al minorista."
                     
-                    # Guardamos la conversación
                     st.session_state.chat_michael = {"activo": activo_sel, "q": user_question, "a": respuesta_ai}
             
-            # Renderizado del chat
             if st.session_state.chat_michael["activo"] == activo_sel and st.session_state.chat_michael["a"]:
                 st.markdown(f"""
                 <div class="chat-box">
@@ -747,6 +753,23 @@ with tab_nosotros:
 # ==========================================
 with tab_guia:
     st.title("💡 Cómo Sacarle el Máximo Provecho a la Terminal")
+    
+    # ==========================================
+    # NUEVO MÓDULO: INSTALACIÓN PWA
+    # ==========================================
+    st.markdown("""
+    <div class="quant-card" style="border-left: 4px solid #3fb950;">
+    <h4>📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
+    <p style="font-size: 14px; color: #c9d1d9;">Market Radar está optimizado como una Aplicación Web Progresiva (PWA). No necesitas descargar archivos pesados de una tienda. Sigue estos pasos para instalarla en tu dispositivo y usarla a pantalla completa:</p>
+    <ul style="font-size: 13.5px; color: #c9d1d9; line-height: 1.6;">
+        <li><b>📱 Android (Chrome):</b> Abre este enlace en tu navegador Chrome, toca los 3 puntos (menú arriba a la derecha) y selecciona <b>"Agregar a la pantalla principal"</b> o "Instalar aplicación".</li>
+        <li><b>🍎 iOS / iPhone (Safari):</b> Abre este enlace en Safari, toca el ícono de compartir (el cuadrado con la flecha hacia arriba) y selecciona <b>"Agregar a inicio"</b>.</li>
+        <li><b>💻 macOS (Safari):</b> Ve a "Archivo" en la barra superior de tu Mac y selecciona <b>"Agregar al Dock"</b>.</li>
+    </ul>
+    <p style="font-size: 12px; color: #8b949e; margin-top: 10px;"><i>💡 Resultado: Tendrás el logotipo de Market Radar en tu menú de aplicaciones y la terminal operará sin la barra de direcciones del navegador.</i></p>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("### Guía Práctica de Trabajo Diario en 4 Pasos")
 
     st.markdown("""
