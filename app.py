@@ -8,10 +8,13 @@ import os
 import re
 from datetime import datetime, timedelta
 
-# --- CONFIGURACIÓN DE PÁGINA ---
+# --- CONFIGURACIÓN DE PÁGINA (CORRECCIÓN DE ÍCONO DE MARCA) ---
+# Si tu logo.png está en la carpeta, lo usará como ícono del navegador y de la app PWA.
+icono_app = "logo.png" if os.path.exists("logo.png") else "📊"
+
 st.set_page_config(
     page_title="Market Radar Quant Terminal",
-    page_icon="📈",
+    page_icon=icono_app,
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -362,8 +365,7 @@ def obtener_calendario_economico_dinamico():
         eventos = [
             {"Fecha": hoy.strftime("%a, %d %b %Y"), "Evento": "Revisar Calendario Económico en Portales (Sin conexión al Feed)", "Impacto": "🟡 Impacto Medio", "Link": "https://es.investing.com/economic-calendar/"}
         ]
-    return eventos
-# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
+    return eventos# --- NAVEGACIÓN PRINCIPAL POR PESTAÑAS (TABS) ---
 tab_terminal, tab_nosotros, tab_guia, tab_contacto = st.tabs([
     "📊 Terminal de Mercado", 
     "🏛️ Quiénes Somos", 
@@ -390,7 +392,7 @@ with tab_terminal:
             color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
         return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
-    # --- NUEVO MÓDULO: INSTALACIÓN PWA EN PORTADA ---
+    # --- MÓDULO: INSTALACIÓN PWA EN PORTADA ---
     st.markdown("""
     <div class="quant-card" style="border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 25px;">
     <h4 style="margin-top:0;">📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
@@ -754,9 +756,6 @@ with tab_nosotros:
 with tab_guia:
     st.title("💡 Cómo Sacarle el Máximo Provecho a la Terminal")
     
-    # ==========================================
-    # NUEVO MÓDULO: INSTALACIÓN PWA
-    # ==========================================
     st.markdown("""
     <div class="quant-card" style="border-left: 4px solid #3fb950;">
     <h4>📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
