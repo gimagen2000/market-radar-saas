@@ -21,7 +21,8 @@ st.set_page_config(
 # --- VARIABLES DE ENLACES EXTERNOS ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
-APK_DOWNLOAD_LINK = "https://drive.google.com/file/d/1C4O_Yjrb-v0FhejhztubBfBHFiwBTvYv/view?usp=sharing"
+# NUEVO ENLACE DEL APK OFICIAL:
+APK_DOWNLOAD_LINK = "https://drive.google.com/file/d/18pY1UFA_9fdHhOck5HWLx74rDx_ekwUJ/view?usp=sharing"
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK ---
 LOGO_SVG_LARGE = """
@@ -92,10 +93,14 @@ def render_adsense(client_id, slot_id, height=100):
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
-    /* SOLUCIÓN AGRESIVA AL PULL-TO-REFRESH EN MÓVILES Y APK */
+    /* BLOQUEO NUCLEAR AL PULL-TO-REFRESH PARA CADA CAPA DE LA APP */
+    * {
+        overscroll-behavior-y: contain !important;
+    }
     html, body, .stApp, [data-testid="stAppViewContainer"], main {
-        overscroll-behavior: none !important;
         overscroll-behavior-y: none !important;
+        overscroll-behavior: none !important;
+        overflow-y: auto;
     }
     
     .main { background-color: #0e1117; color: #c9d1d9; }
