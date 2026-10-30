@@ -21,8 +21,8 @@ st.set_page_config(
 # --- VARIABLES DE ENLACES EXTERNOS ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
-# NUEVO ENLACE DEL APK OFICIAL:
-APK_DOWNLOAD_LINK = "https://drive.google.com/file/d/18pY1UFA_9fdHhOck5HWLx74rDx_ekwUJ/view?usp=sharing"
+# ENLACE DEL APK OFICIAL ACTUALIZADO:
+APK_DOWNLOAD_LINK = "https://drive.google.com/file/d/16Em7jsJXBz81PQVCn8sdq_Rp8qSm7vLq/view?usp=drive_link"
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK ---
 LOGO_SVG_LARGE = """
