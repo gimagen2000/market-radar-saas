@@ -9,7 +9,6 @@ import re
 from datetime import datetime, timedelta
 
 # --- CONFIGURACIÓN DE PÁGINA (CORRECCIÓN DE ÍCONO DE MARCA) ---
-# Si tu logo.png está en la carpeta, lo usará como ícono del navegador y de la app PWA.
 icono_app = "logo.png" if os.path.exists("logo.png") else "📊"
 
 st.set_page_config(
@@ -22,6 +21,7 @@ st.set_page_config(
 # --- VARIABLES DE ENLACES EXTERNOS ---
 LIBERTEX_AFFILIATE_URL = "https://libertex.fxclub.org/goto/raf2?rid=12386667"
 TRADINGVIEW_AFFILIATE_URL = "https://es.tradingview.com/?aff_id=1173007"
+APK_DOWNLOAD_LINK = "https://drive.google.com/file/d/1C4O_Yjrb-v0FhejhztubBfBHFiwBTvYv/view?usp=sharing"
 
 # --- LOGOTIPO SVG NATIVO / FALLBACK ---
 LOGO_SVG_LARGE = """
@@ -92,6 +92,11 @@ def render_adsense(client_id, slot_id, height=100):
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
+    /* SOLUCIÓN AL PROBLEMA DE ACTUALIZAR AL DESLIZAR (PULL-TO-REFRESH) EN MÓVILES */
+    html, body, [data-testid="stAppViewContainer"] {
+        overscroll-behavior-y: none;
+    }
+    
     .main { background-color: #0e1117; color: #c9d1d9; }
     .stMetric { background-color: #161b22; padding: 15px; border-radius: 8px; border: 1px solid #30363d; }
     .quant-card { background-color: #161b22; padding: 20px; border-radius: 10px; border: 1px solid #30363d; margin-bottom: 20px; }
@@ -392,13 +397,17 @@ with tab_terminal:
             color = 'background-color: rgba(139, 148, 158, 0.1); color: #8b949e;'
         return [color if col == 'Estructura Estadística' else '' for col in row.index]
 
-    # --- MÓDULO: INSTALACIÓN PWA EN PORTADA ---
-    st.markdown("""
+    # --- MÓDULO ACTUALIZADO: INSTALACIÓN CON BOTÓN DE DESCARGA DIRECTA (APK) ---
+    st.markdown(f"""
     <div class="quant-card" style="border-left: 4px solid #3fb950; padding: 15px; margin-bottom: 25px;">
-    <h4 style="margin-top:0;">📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
-    <p style="font-size: 13.5px; color: #c9d1d9;">Market Radar está optimizado como una Aplicación Web Progresiva (PWA). Sigue estos pasos para instalarla y usarla a pantalla completa, sin descargas de tienda:</p>
+    <h4 style="margin-top:0;">📲 Instalar Market Radar (App Nativa)</h4>
+    <p style="font-size: 13.5px; color: #c9d1d9;">Hemos liberado la versión nativa para Android libre de marcas de terceros. Instálala directamente o usa las opciones de Apple:</p>
+    
+    <div style="text-align: left; margin: 15px 0;">
+        <a href="{APK_DOWNLOAD_LINK}" target="_blank" style="background-color: #238636; color: white !important; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">📥 Descargar APK para Android</a>
+    </div>
+
     <ul style="font-size: 13px; color: #c9d1d9; line-height: 1.5; margin-bottom: 0;">
-        <li><b>📱 Android (Chrome):</b> Abre este enlace en Chrome, toca los 3 puntos (arriba a la derecha) y selecciona <b>"Agregar a la pantalla principal"</b>.</li>
         <li><b>🍎 iOS / iPhone (Safari):</b> Abre este enlace en Safari, toca el ícono de compartir y selecciona <b>"Agregar a inicio"</b>.</li>
         <li><b>💻 macOS (Safari):</b> Ve a "Archivo" en la barra superior de tu Mac y selecciona <b>"Agregar al Dock"</b>.</li>
     </ul>
@@ -756,16 +765,20 @@ with tab_nosotros:
 with tab_guia:
     st.title("💡 Cómo Sacarle el Máximo Provecho a la Terminal")
     
-    st.markdown("""
+    # --- MÓDULO ACTUALIZADO: INSTALACIÓN CON BOTÓN DE DESCARGA DIRECTA (APK) ---
+    st.markdown(f"""
     <div class="quant-card" style="border-left: 4px solid #3fb950;">
-    <h4>📲 Instalar Market Radar como App Nativa (Android, iOS y Mac)</h4>
-    <p style="font-size: 14px; color: #c9d1d9;">Market Radar está optimizado como una Aplicación Web Progresiva (PWA). No necesitas descargar archivos pesados de una tienda. Sigue estos pasos para instalarla en tu dispositivo y usarla a pantalla completa:</p>
-    <ul style="font-size: 13.5px; color: #c9d1d9; line-height: 1.6;">
-        <li><b>📱 Android (Chrome):</b> Abre este enlace en tu navegador Chrome, toca los 3 puntos (menú arriba a la derecha) y selecciona <b>"Agregar a la pantalla principal"</b> o "Instalar aplicación".</li>
+    <h4>📲 Instalar Market Radar (App Nativa)</h4>
+    <p style="font-size: 14px; color: #c9d1d9;">Hemos liberado la versión nativa para Android libre de marcas de terceros. Instálala directamente o usa las opciones de Apple:</p>
+    
+    <div style="text-align: left; margin: 15px 0;">
+        <a href="{APK_DOWNLOAD_LINK}" target="_blank" style="background-color: #238636; color: white !important; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; display: inline-block;">📥 Descargar APK para Android</a>
+    </div>
+
+    <ul style="font-size: 13.5px; color: #c9d1d9; line-height: 1.6; margin-bottom: 0;">
         <li><b>🍎 iOS / iPhone (Safari):</b> Abre este enlace en Safari, toca el ícono de compartir (el cuadrado con la flecha hacia arriba) y selecciona <b>"Agregar a inicio"</b>.</li>
         <li><b>💻 macOS (Safari):</b> Ve a "Archivo" en la barra superior de tu Mac y selecciona <b>"Agregar al Dock"</b>.</li>
     </ul>
-    <p style="font-size: 12px; color: #8b949e; margin-top: 10px;"><i>💡 Resultado: Tendrás el logotipo de Market Radar en tu menú de aplicaciones y la terminal operará sin la barra de direcciones del navegador.</i></p>
     </div>
     """, unsafe_allow_html=True)
 
