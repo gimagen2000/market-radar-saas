@@ -92,9 +92,10 @@ def render_adsense(client_id, slot_id, height=100):
 # --- ESTILOS CSS PROFESIONALES ---
 st.markdown("""
     <style>
-    /* SOLUCIÓN AL PROBLEMA DE ACTUALIZAR AL DESLIZAR (PULL-TO-REFRESH) EN MÓVILES */
-    html, body, [data-testid="stAppViewContainer"] {
-        overscroll-behavior-y: none;
+    /* SOLUCIÓN AGRESIVA AL PULL-TO-REFRESH EN MÓVILES Y APK */
+    html, body, .stApp, [data-testid="stAppViewContainer"], main {
+        overscroll-behavior: none !important;
+        overscroll-behavior-y: none !important;
     }
     
     .main { background-color: #0e1117; color: #c9d1d9; }
